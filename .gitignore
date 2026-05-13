@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+frontend/dist/
+backend/dist/
+
+# Env (keep .env.example tracked)
+.env
+.env.local
+backend/.env
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE & tooling
+.idea/
+.vscode/
+.cursor/
+
+# Prisma local DB
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Vite cache
+frontend/node_modules/.vite/
+
+# TypeScript cache
+*.tsbuildinfo

@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: "Google Sans", "Product Sans", system-ui, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --color-gcal-bg: #131314;
+  --color-gcal-panel: #1e1f20;
+  --color-gcal-border: #3c4043;
+  --color-gcal-text: #bdc1c6;
+  --color-gcal-accent: #8ab4f8;
+  --color-gcal-accent-hover: #aecbfa;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-gcal-bg);
+  color: var(--color-gcal-text);
+  -webkit-font-smoothing: antialiased;
+}
