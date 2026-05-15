@@ -17,6 +17,10 @@ From the repo root:
 docker compose up -d
 ```
 
+Postgres is mapped to **host port 5433** (not 5432) so it does not collide with a locally installed PostgreSQL. Use `localhost:5433` in `DATABASE_URL`.
+
+If a previous run failed, run `docker compose down` then `docker compose up -d` again after fixing the port.
+
 ### 2. Backend
 
 ```bash
