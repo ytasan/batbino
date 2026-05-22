@@ -10,7 +10,6 @@ export function SeparatorThin() {
 }
 
 type SidebarProps = {
-  userName?: string | null
   monthDate: Date
   selectedDate: Date
   today: Date
@@ -23,7 +22,6 @@ type SidebarProps = {
 }
 
 export function Sidebar({
-  userName,
   monthDate,
   selectedDate,
   today,
@@ -66,18 +64,12 @@ export function Sidebar({
       <SeparatorThin />
 
       <div className="px-8 pb-2 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">
-        My calendars
+        Calendars
       </div>
       <div className="flex flex-col gap-2 px-4 pb-10">
         {calendars.map((c) => {
           const checked = visibleById[c.id] ?? c.isVisibleDefault
           const color = c.color || '#4285f4'
-          const label =
-            c.name.toLowerCase() === 'birthdays'
-              ? 'Birthdays'
-              : userName && c.name === userName
-                ? userName
-                : c.name
           return (
             <label
               key={c.id}
@@ -88,22 +80,10 @@ export function Sidebar({
                 onCheckedChange={(v) => onToggleCalendar(c.id, v === true)}
               />
               <span className="h-3 w-3 shrink-0 rounded-sm" style={{ backgroundColor: color }} />
-              <span className="truncate">{label}</span>
+              <span className="truncate">{c.name}</span>
             </label>
           )
         })}
-      </div>
-
-      <SeparatorThin />
-
-      <div className="px-8 pb-2 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">
-        Other calendars
-      </div>
-      <div className="flex flex-col gap-2 px-4 pb-10">
-        <label className="flex cursor-default items-center gap-3 py-1.5 text-[14px] text-[#80868b]">
-          <Checkbox checked={false} disabled className="opacity-50" />
-          <span className="truncate">Holidays in Turkey</span>
-        </label>
       </div>
     </aside>
   )

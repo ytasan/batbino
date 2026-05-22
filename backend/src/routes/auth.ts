@@ -32,9 +32,9 @@ router.post("/register", async (req, res) => {
       name,
       calendars: {
         create: [
-          { name: "Tasks", color: DEFAULT_CALENDAR_COLOR, isVisibleDefault: true },
-          { name: name, color: "#4285f4", isVisibleDefault: true },
-          { name: "Birthdays", color: "#fa903e", isVisibleDefault: false },
+          { name: "technical", color: "#fa903e", isVisibleDefault: false },
+          { name: "general", color: DEFAULT_CALENDAR_COLOR, isVisibleDefault: true },
+          { name: "trivia", color: "#4285f4", isVisibleDefault: true },
         ],
       },
     },

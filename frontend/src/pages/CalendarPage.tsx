@@ -20,7 +20,7 @@ import { fetchCalendars, fetchEvents, type CalendarListItem, type EventApi } fro
 import { useAuth } from '@/context/AuthContext'
 
 export function CalendarPage() {
-  const { token, user, logout } = useAuth()
+  const { token, logout } = useAuth()
   const today = new Date()
   const [month, setMonth] = useState(() => startOfMo(new Date()))
   const [selectedDate, setSelectedDate] = useState(() => new Date())
@@ -132,7 +132,6 @@ export function CalendarPage() {
       ) : null}
       <div className="flex min-h-0 flex-1">
         <Sidebar
-          userName={user?.name}
           monthDate={month}
           selectedDate={selectedDate}
           today={today}
