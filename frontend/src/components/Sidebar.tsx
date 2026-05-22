@@ -60,13 +60,13 @@ export function Sidebar({
       />
 
       <div className="px-4 pb-10">
-        <Input readOnly placeholder="Kişileri arayın" className="h-11 cursor-default" />
+        <Input readOnly placeholder="Search" className="h-11 cursor-default" />
       </div>
 
       <SeparatorThin />
 
       <div className="px-8 pb-2 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">
-        Takvimlerim
+        My calendars
       </div>
       <div className="flex flex-col gap-2 px-4 pb-10">
         {calendars.map((c) => {
@@ -74,7 +74,7 @@ export function Sidebar({
           const color = c.color || '#4285f4'
           const label =
             c.name.toLowerCase() === 'birthdays'
-              ? 'Doğum günleri'
+              ? 'Birthdays'
               : userName && c.name === userName
                 ? userName
                 : c.name
@@ -97,12 +97,12 @@ export function Sidebar({
       <SeparatorThin />
 
       <div className="px-8 pb-2 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">
-        Diğer takvimler
+        Other calendars
       </div>
       <div className="flex flex-col gap-2 px-4 pb-10">
         <label className="flex cursor-default items-center gap-3 py-1.5 text-[14px] text-[#80868b]">
           <Checkbox checked={false} disabled className="opacity-50" />
-          <span className="truncate">Türkiye&apos;deki tatiller</span>
+          <span className="truncate">Holidays in Turkey</span>
         </label>
       </div>
     </aside>

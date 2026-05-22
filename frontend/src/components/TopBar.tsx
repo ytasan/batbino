@@ -1,5 +1,4 @@
 import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
 import {
   ChevronDown,
   ChevronLeft,
@@ -40,7 +39,7 @@ export function TopBar({ month, onToday, onPrevMonth, onNextMonth }: TopBarProps
           </Button>
         </div>
         <h1 className="truncate pl-2 text-[22px] font-normal capitalize text-[#e3e3e3]">
-          {format(month, 'LLLL yyyy', { locale: tr })}
+          {format(month, 'LLLL yyyy')}
         </h1>
       </div>
       <div className="flex shrink-0 items-center gap-1 pr-2">
@@ -59,7 +58,7 @@ export function TopBar({ month, onToday, onPrevMonth, onNextMonth }: TopBarProps
           className="ml-3 gap-1 border border-transparent font-medium capitalize"
           disabled
         >
-          Ay
+          Month
           <ChevronDown className="h-4 w-4" />
         </Button>
       </div>

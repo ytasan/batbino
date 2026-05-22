@@ -51,7 +51,7 @@ export function CalendarPage() {
         return next
       })
     } catch (e) {
-      setLoadErr(e instanceof Error ? e.message : 'Kalender yüklenemedi')
+      setLoadErr(e instanceof Error ? e.message : 'Failed to load calendars')
     }
   }, [token])
 
@@ -69,7 +69,7 @@ export function CalendarPage() {
       const list = await fetchEvents(from, toExclusive, activeIds.length ? activeIds : undefined)
       setEvents(list)
     } catch (e) {
-      setLoadErr(e instanceof Error ? e.message : 'Etkinlikler alınamadı')
+      setLoadErr(e instanceof Error ? e.message : 'Failed to load events')
     }
   }, [token, month, calendars, visibleCalendarIds])
 
@@ -189,7 +189,7 @@ export function CalendarPage() {
 
       <div className="absolute bottom-6 right-[88px] z-10">
         <Button variant="ghost" size="sm" className="text-[#bdc1c6]" type="button" onClick={() => logout()}>
-          Çıkış
+          Sign out
         </Button>
       </div>
 

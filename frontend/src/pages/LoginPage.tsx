@@ -38,7 +38,7 @@ export function LoginPage() {
     <div className="flex min-h-full items-center justify-center bg-[#131314] p-8">
       <div className="w-full max-w-md rounded-xl border border-[#3c4043] bg-[#1e1f20] p-8 shadow-2xl">
         <h1 className="mb-2 text-2xl font-normal text-[#e3e3e3]">Calendar</h1>
-        <p className="mb-8 text-[14px] text-[#80868b]">Hesap oluşturun veya oturum açın.</p>
+        <p className="mb-8 text-[14px] text-[#80868b]">Create an account or sign in.</p>
         <div className="mb-6 flex gap-2 rounded-lg bg-[#131314] p-1">
           <button
             type="button"
@@ -49,7 +49,7 @@ export function LoginPage() {
                 : 'text-[#bdc1c6] hover:bg-[#292a2d]/60'
             }`}
           >
-            Giriş
+            Sign in
           </button>
           <button
             type="button"
@@ -60,18 +60,18 @@ export function LoginPage() {
                 : 'text-[#bdc1c6] hover:bg-[#292a2d]/60'
             }`}
           >
-            Kayıt
+            Register
           </button>
         </div>
         <form onSubmit={onSubmit} className="grid gap-4">
           {tab === 'register' ? (
             <div className="grid gap-2">
-              <Label htmlFor="name">İsim</Label>
+              <Label htmlFor="name">Name</Label>
               <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />
             </div>
           ) : null}
           <div className="grid gap-2">
-            <Label htmlFor="email">E‑posta</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
@@ -82,7 +82,7 @@ export function LoginPage() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="pw">Şifre</Label>
+            <Label htmlFor="pw">Password</Label>
             <Input
               id="pw"
               type="password"
@@ -94,7 +94,7 @@ export function LoginPage() {
           </div>
           {error ? <p className="text-sm text-[#ea4335]">{error}</p> : null}
           <Button variant="primary" type="submit" className="mt-4 w-full" disabled={busy}>
-            {busy ? 'İşlem…' : tab === 'login' ? 'Giriş yap' : 'Kayıt ol'}
+            {busy ? 'Working…' : tab === 'login' ? 'Sign in' : 'Register'}
           </Button>
         </form>
         <div className="mt-10 text-center text-xs text-[#80868b]">

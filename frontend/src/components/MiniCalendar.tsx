@@ -62,7 +62,7 @@ export function MiniCalendar({
         </div>
       </div>
       <div className="grid grid-cols-[repeat(7,1fr)] gap-y-3 text-[11px] font-medium uppercase text-[#bdc1c6]">
-        {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((d) => (
+        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
           <div key={d} className="flex justify-center">
             {d}
           </div>

@@ -49,7 +49,7 @@ export function MonthGrid({
     const wn = chunkDays(flat, 7)
     return {
       weeks: wn,
-      weekdays: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+      weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     }
   }, [month])
 
@@ -135,7 +135,7 @@ export function MonthGrid({
                       ))}
                       {dayEvts.length > 3 ? (
                         <span className="px-1 text-[11px] text-[#8ab4f8]">
-                          +{dayEvts.length - 3} daha
+                          +{dayEvts.length - 3} more
                         </span>
                       ) : null}
                     </div>

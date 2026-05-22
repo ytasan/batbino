@@ -90,20 +90,20 @@ export function CreateEventDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
-        <DialogTitle>Yeni etkinlik</DialogTitle>
+        <DialogTitle>New event</DialogTitle>
         <form onSubmit={submit} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="evt-title">Başlık</Label>
+            <Label htmlFor="evt-title">Title</Label>
             <Input
               id="evt-title"
               value={title}
               onChange={(x) => setTitle(x.target.value)}
-              placeholder="Etkinlik başlığı"
+              placeholder="Event title"
               autoFocus
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="evt-cal">Takvim</Label>
+            <Label htmlFor="evt-cal">Calendar</Label>
             <select
               id="evt-cal"
               className="h-11 rounded-lg border border-[#3c4043] bg-[#131314] px-3 text-[15px] text-[#e3e3e3] outline-none focus-visible:border-[#8ab4f8]"
@@ -119,7 +119,7 @@ export function CreateEventDialog({
           </div>
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="evt-start">Başlangıç</Label>
+              <Label htmlFor="evt-start">Start</Label>
               <Input
                 id="evt-start"
                 type="datetime-local"
@@ -128,7 +128,7 @@ export function CreateEventDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="evt-end">Bitiş</Label>
+              <Label htmlFor="evt-end">End</Label>
               <Input
                 id="evt-end"
                 type="datetime-local"
@@ -140,7 +140,7 @@ export function CreateEventDialog({
           {error ? <p className="text-sm text-red-400">{error}</p> : null}
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="default" className="min-w-[88px]" onClick={() => onOpenChange(false)}>
-              İptal
+              Cancel
             </Button>
             <Button
               type="submit"
@@ -148,7 +148,7 @@ export function CreateEventDialog({
               className="min-w-[112px]"
               disabled={loading}
             >
-              {loading ? '…' : 'Kaydet'}
+              {loading ? '…' : 'Save'}
             </Button>
           </div>
         </form>
