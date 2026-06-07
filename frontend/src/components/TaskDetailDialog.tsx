@@ -1,13 +1,14 @@
-// Dialog to create a task. Component and API names still use "event" internally.
+import { isSameDay, parseISO } from 'date-fns'
 import { useEffect, useState } from 'react'
 
-import type { CalendarListItem } from '@/lib/api'
-import { createEventApi } from '@/lib/api'
+import type { CalendarListItem, EventApi } from '@/lib/api'
+import { deleteEventApi, updateEventApi } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 function toLocalDatetimeValue(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -22,47 +23,69 @@ function allDayRange(day: Date): { start: Date; end: Date } {
   return { start, end }
 }
 
-type CreateEventDialogProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  calendars: CalendarListItem[]
-  defaultDay: Date
-  onCreated: () => void
+function isLegacyTimedTask(task: EventApi): boolean {
+  if (task.allDay) return false
+  const start = parseISO(task.startAt)
+  const end = parseISO(task.endAt)
+  return (
+    isSameDay(start, end) &&
+    start.getHours() === 9 &&
+    start.getMinutes() === 0 &&
+    end.getHours() === 10 &&
+    end.getMinutes() === 0
+  )
 }
 
-export function CreateEventDialog({
+type TaskDetailDialogProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  task: EventApi | null
+  calendars: CalendarListItem[]
+  onUpdated: () => void
+}
+
+export function TaskDetailDialog({
   open,
   onOpenChange,
+  task,
   calendars,
-  defaultDay,
-  onCreated,
-}: CreateEventDialogProps) {
+  onUpdated,
+}: TaskDetailDialogProps) {
   const [title, setTitle] = useState('')
   const [calendarId, setCalendarId] = useState('')
   const [startLocal, setStartLocal] = useState('')
   const [endLocal, setEndLocal] = useState('')
+  const [description, setDescription] = useState('')
   const [allDay, setAllDay] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    if (!open || calendars.length === 0) return
-    const { start, end } = allDayRange(defaultDay)
-    setStartLocal(toLocalDatetimeValue(start))
-    setEndLocal(toLocalDatetimeValue(end))
-    setAllDay(true)
-    setCalendarId((id) => id || calendars[0]?.id || '')
-    setTitle('')
+    if (!open || !task) return
+    setTitle(task.title)
+    setCalendarId(task.calendarId)
+    setDescription(task.description ?? '')
     setError(null)
-  }, [open, defaultDay, calendars])
+
+    const start = parseISO(task.startAt)
+    const useAllDay = task.allDay || isLegacyTimedTask(task)
+    setAllDay(useAllDay)
+
+    if (useAllDay) {
+      const { start: dayStart, end: dayEnd } = allDayRange(start)
+      setStartLocal(toLocalDatetimeValue(dayStart))
+      setEndLocal(toLocalDatetimeValue(dayEnd))
+    } else {
+      setStartLocal(toLocalDatetimeValue(start))
+      setEndLocal(toLocalDatetimeValue(parseISO(task.endAt)))
+    }
+  }, [open, task])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    const cal = calendars.find((c) => c.id === calendarId)
-    if (!cal) {
-      setError('Select a calendar')
-      return
-    }
+    if (!task) return
+
     if (!title.trim()) {
       setError('Title is required')
       return
@@ -77,44 +100,75 @@ export function CreateEventDialog({
       setError('End must be after start')
       return
     }
+
     setLoading(true)
     setError(null)
     try {
-      await createEventApi({
-        calendarId: cal.id,
+      await updateEventApi(task.id, {
         title: title.trim(),
+        calendarId,
+        description: description.trim() || null,
         startAt: start.toISOString(),
         endAt: end.toISOString(),
         allDay,
       })
-      onCreated()
+      onUpdated()
       onOpenChange(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create event')
+      setError(err instanceof Error ? err.message : 'Failed to update task')
     } finally {
       setLoading(false)
     }
   }
 
+  async function remove() {
+    if (!task) return
+    if (!window.confirm('Delete this task?')) return
+
+    setDeleting(true)
+    setError(null)
+    try {
+      await deleteEventApi(task.id)
+      onUpdated()
+      onOpenChange(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete task')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  if (!task) return null
+
+  const selectedCalendar = calendars.find((c) => c.id === calendarId) ?? task.calendar
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
-        <DialogTitle>New event</DialogTitle>
+        <div className="flex items-center gap-3 pr-8">
+          <span
+            className="h-4 w-4 shrink-0 rounded-full"
+            style={{ backgroundColor: selectedCalendar.color }}
+            aria-hidden
+          />
+          <DialogTitle>Edit task</DialogTitle>
+        </div>
+
         <form onSubmit={submit} className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="evt-title">Title</Label>
+            <Label htmlFor="task-title">Title</Label>
             <Input
-              id="evt-title"
+              id="task-title"
               value={title}
               onChange={(x) => setTitle(x.target.value)}
-              placeholder="Event title"
               autoFocus
             />
           </div>
+
           <div className="grid gap-2">
-            <Label htmlFor="evt-cal">Calendar</Label>
+            <Label htmlFor="task-cal">Calendar</Label>
             <select
-              id="evt-cal"
+              id="task-cal"
               className="h-11 rounded-lg border border-[#3c4043] bg-[#131314] px-3 text-[15px] text-[#e3e3e3] outline-none focus-visible:border-[#8ab4f8]"
               value={calendarId}
               onChange={(x) => setCalendarId(x.target.value)}
@@ -126,9 +180,10 @@ export function CreateEventDialog({
               ))}
             </select>
           </div>
+
           <div className="flex items-center gap-2">
             <Checkbox
-              id="evt-allday"
+              id="task-allday"
               checked={allDay}
               onCheckedChange={(v) => {
                 const next = v === true
@@ -148,43 +203,72 @@ export function CreateEventDialog({
                 }
               }}
             />
-            <Label htmlFor="evt-allday" className="cursor-pointer font-normal">
+            <Label htmlFor="task-allday" className="cursor-pointer font-normal">
               All day
             </Label>
           </div>
+
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="evt-start">Start</Label>
+              <Label htmlFor="task-start">Start</Label>
               <Input
-                id="evt-start"
+                id="task-start"
                 type="datetime-local"
                 value={startLocal}
                 onChange={(x) => setStartLocal(x.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="evt-end">End</Label>
+              <Label htmlFor="task-end">End</Label>
               <Input
-                id="evt-end"
+                id="task-end"
                 type="datetime-local"
                 value={endLocal}
                 onChange={(x) => setEndLocal(x.target.value)}
               />
             </div>
           </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="task-desc">Description</Label>
+            <textarea
+              id="task-desc"
+              rows={3}
+              value={description}
+              onChange={(x) => setDescription(x.target.value)}
+              className={cn(
+                'w-full min-w-0 resize-y rounded-lg border border-[#3c4043] bg-[#1e1f20] px-3 py-2 text-[15px] text-[#e3e3e3] outline-none placeholder:text-[#80868b] focus-visible:border-[#8ab4f8]',
+              )}
+              placeholder="Optional notes"
+            />
+          </div>
+
           {error ? <p className="text-sm text-red-400">{error}</p> : null}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="default" className="min-w-[88px]" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
+
+          <div className="flex items-center justify-between gap-3 pt-2">
             <Button
-              type="submit"
-              variant="primary"
-              className="min-w-[112px]"
-              disabled={loading}
+              type="button"
+              variant="default"
+              className="min-w-[88px] text-[#f28b82] hover:text-[#f28b82]"
+              disabled={loading || deleting}
+              onClick={() => void remove()}
             >
-              {loading ? '…' : 'Save'}
+              {deleting ? '…' : 'Delete'}
             </Button>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="default"
+                className="min-w-[88px]"
+                disabled={loading || deleting}
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" className="min-w-[112px]" disabled={loading || deleting}>
+                {loading ? '…' : 'Save'}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>

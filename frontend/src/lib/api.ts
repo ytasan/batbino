@@ -141,3 +141,11 @@ export async function updateEventApi(
   if (!res.ok) throw new Error(await parseError(res))
   return res.json()
 }
+
+export async function deleteEventApi(id: string): Promise<void> {
+  const res = await fetch(`${getBase()}/events/${id}`, {
+    method: 'DELETE',
+    headers: headers(),
+  })
+  if (!res.ok) throw new Error(await parseError(res))
+}

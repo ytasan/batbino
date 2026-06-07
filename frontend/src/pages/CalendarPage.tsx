@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 
 import { CreateEventDialog } from '@/components/CreateEventDialog'
+import { TaskDetailDialog } from '@/components/TaskDetailDialog'
 import { MonthGrid } from '@/components/MonthGrid'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
@@ -39,6 +40,8 @@ export function CalendarPage() {
   // Tasks loaded from /events (EventApi).
   const [events, setEvents] = useState<EventApi[]>([])
   const [createOpen, setCreateOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<EventApi | null>(null)
+  const [taskDetailOpen, setTaskDetailOpen] = useState(false)
   const [loadErr, setLoadErr] = useState<string | null>(null)
 
   const visibleCalendarIds = useMemo(() => {
@@ -203,6 +206,10 @@ export function CalendarPage() {
               today={today}
               selectedDate={selectedDate}
               onSelectDay={onSelectDay}
+              onSelectTask={(task) => {
+                setSelectedTask(task)
+                setTaskDetailOpen(true)
+              }}
               onMoveTask={(taskId, targetDay) => void onMoveTask(taskId, targetDay)}
               events={events}
               visibleCalendarIds={visibleCalendarIds}
@@ -241,6 +248,14 @@ export function CalendarPage() {
           void refreshLists()
           void reloadEvents()
         }}
+      />
+
+      <TaskDetailDialog
+        open={taskDetailOpen}
+        onOpenChange={setTaskDetailOpen}
+        task={selectedTask}
+        calendars={calendarOptionsForModal}
+        onUpdated={() => void reloadEvents()}
       />
     </div>
   )
