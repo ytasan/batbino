@@ -155,10 +155,11 @@ export function CalendarPage() {
 
     const start = parseISO(task.startAt)
     const end = parseISO(task.endAt)
-    if (isSameDay(start, targetDay)) return
+    const target = startOfDay(targetDay)
+    if (isSameDay(startOfDay(start), target)) return
 
     const durationMs = end.getTime() - start.getTime()
-    const newStart = new Date(targetDay)
+    const newStart = new Date(target)
     newStart.setHours(start.getHours(), start.getMinutes(), start.getSeconds(), 0)
     const newEnd = new Date(newStart.getTime() + durationMs)
 

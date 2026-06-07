@@ -230,6 +230,7 @@ export function MonthGrid({
             : []
         }
         onSelectTask={onSelectTask}
+        onMoveTask={onMoveTask}
       />
     </div>
   )
