@@ -12,6 +12,7 @@ import {
 } from 'date-fns'
 import { useMemo, useRef, useState } from 'react'
 
+// yt note: DayTasksDialog = 1 gune sigmayan gorev listesinin yeni model win'de gosterimi 
 import { DayTasksDialog } from '@/components/DayTasksDialog'
 import type { EventApi } from '@/lib/api'
 import { cn } from '@/lib/utils'
