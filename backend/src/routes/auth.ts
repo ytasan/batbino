@@ -5,7 +5,7 @@ import { prisma } from "../lib/prisma.js";
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET!;
-const DEFAULT_CALENDAR_COLOR = "#8ab4f8";
+const GENERAL_CALENDAR_COLOR = "#81c995";
 
 router.post("/register", async (req, res) => {
   const email = String(req.body?.email ?? "").trim().toLowerCase();
@@ -33,7 +33,7 @@ router.post("/register", async (req, res) => {
       calendars: {
         create: [
           { name: "technical", color: "#fa903e", isVisibleDefault: false },
-          { name: "general", color: DEFAULT_CALENDAR_COLOR, isVisibleDefault: true },
+          { name: "general", color: GENERAL_CALENDAR_COLOR, isVisibleDefault: true },
           { name: "trivia", color: "#4285f4", isVisibleDefault: true },
         ],
       },
