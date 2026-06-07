@@ -1,4 +1,4 @@
-# Calendar (Google-style MVP)
+# Batbino (Google-style MVP)
 
 Full-stack calendar and task MVP: React + Vite frontend, Express + Prisma + PostgreSQL backend.
 
@@ -61,7 +61,7 @@ Open `http://localhost:5173`, register or sign in, then use **Create** to add ev
 ## Project layout
 
 ```
-calendar/
+batbino/
   docker-compose.yml   # Postgres 16
   backend/             # REST API, Prisma schema & migrations
   frontend/            # React UI
