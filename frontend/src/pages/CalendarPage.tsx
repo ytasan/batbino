@@ -1,6 +1,8 @@
 import {
   endOfMonth,
   endOfWeek,
+  isSameDay,
+  parseISO,
   startOfDay,
   startOfMonth as startOfMo,
   startOfWeek,
@@ -15,7 +17,13 @@ import { MonthGrid } from '@/components/MonthGrid'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import { Button } from '@/components/ui/button'
-import { fetchCalendars, fetchEvents, type CalendarListItem, type EventApi } from '@/lib/api'
+import {
+  fetchCalendars,
+  fetchEvents,
+  updateEventApi,
+  type CalendarListItem,
+  type EventApi,
+} from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 
 export function CalendarPage() {
@@ -116,6 +124,31 @@ export function CalendarPage() {
     setCreateOpen(true)
   }
 
+  async function onMoveTask(taskId: string, targetDay: Date) {
+    const task = events.find((e) => e.id === taskId)
+    if (!task) return
+
+    const start = parseISO(task.startAt)
+    const end = parseISO(task.endAt)
+    if (isSameDay(start, targetDay)) return
+
+    const durationMs = end.getTime() - start.getTime()
+    const newStart = new Date(targetDay)
+    newStart.setHours(start.getHours(), start.getMinutes(), start.getSeconds(), 0)
+    const newEnd = new Date(newStart.getTime() + durationMs)
+
+    setLoadErr(null)
+    try {
+      await updateEventApi(taskId, {
+        startAt: newStart.toISOString(),
+        endAt: newEnd.toISOString(),
+      })
+      void reloadEvents()
+    } catch (e) {
+      setLoadErr(e instanceof Error ? e.message : 'Failed to move task')
+    }
+  }
+
   const calendarOptionsForModal = calendars.filter(
     (c) => visibleById[c.id] ?? c.isVisibleDefault,
   ).length
@@ -159,6 +192,7 @@ export function CalendarPage() {
               today={today}
               selectedDate={selectedDate}
               onSelectDay={onSelectDay}
+              onMoveTask={(taskId, targetDay) => void onMoveTask(taskId, targetDay)}
               events={events}
               visibleCalendarIds={visibleCalendarIds}
             />

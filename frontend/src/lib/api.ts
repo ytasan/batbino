@@ -121,3 +121,23 @@ export async function createEventApi(payload: {
   if (!res.ok) throw new Error(await parseError(res))
   return res.json()
 }
+
+export async function updateEventApi(
+  id: string,
+  payload: {
+    title?: string
+    description?: string | null
+    startAt?: string
+    endAt?: string
+    allDay?: boolean
+    calendarId?: string
+  },
+): Promise<EventApi> {
+  const res = await fetch(`${getBase()}/events/${id}`, {
+    method: 'PATCH',
+    headers: headers(),
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) throw new Error(await parseError(res))
+  return res.json()
+}
