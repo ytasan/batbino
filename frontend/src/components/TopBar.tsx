@@ -12,12 +12,13 @@ import { Button } from '@/components/ui/button'
 
 type TopBarProps = {
   month: Date
+  today: Date
   onToday: () => void
   onPrevMonth: () => void
   onNextMonth: () => void
 }
 
-export function TopBar({ month, onToday, onPrevMonth, onNextMonth }: TopBarProps) {
+export function TopBar({ month, today, onToday, onPrevMonth, onNextMonth }: TopBarProps) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-[#3c4043] px-3 pl-4">
       <div className="flex min-w-0 items-center gap-1">
@@ -37,6 +38,9 @@ export function TopBar({ month, onToday, onPrevMonth, onNextMonth }: TopBarProps
           <Button variant="ghost" size="iconSm" className="text-[#bdc1c6]" onClick={onNextMonth} aria-label="Next month">
             <ChevronRight className="h-5 w-5" />
           </Button>
+        </div>
+        <div className="shrink-0 text-[54px] font-medium leading-none tracking-wide text-[#e3e3e3]">
+          {format(today, 'd')}
         </div>
         <h1 className="truncate pl-2 text-[22px] font-normal capitalize text-[#e3e3e3]">
           {format(month, 'LLLL yyyy')}

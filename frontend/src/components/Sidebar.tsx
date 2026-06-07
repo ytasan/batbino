@@ -5,10 +5,6 @@ import { MiniCalendar } from '@/components/MiniCalendar'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 
-export function SeparatorThin() {
-  return <div className="mx-4 my-6 h-px bg-[#3c4043]" />
-}
-
 type SidebarProps = {
   monthDate: Date
   selectedDate: Date
@@ -57,13 +53,11 @@ export function Sidebar({
         onSelectDay={onSelectMiniDay}
       />
 
-      <div className="px-4 pb-10">
+      <div className="px-4 pb-3">
         <Input readOnly placeholder="Search" className="h-11 cursor-default" />
       </div>
 
-      <SeparatorThin />
-
-      <div className="px-8 pb-2 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">
+      <div className="px-8 pb-2 pt-1 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">
         Calendars
       </div>
       <div className="flex flex-col gap-2 px-4 pb-10">

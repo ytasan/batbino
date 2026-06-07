@@ -1,7 +1,6 @@
 import {
   endOfMonth,
   endOfWeek,
-  format,
   startOfDay,
   startOfMonth as startOfMo,
   startOfWeek,
@@ -121,6 +120,7 @@ export function CalendarPage() {
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#131314] text-[#e3e3e3]">
       <TopBar
         month={month}
+        today={today}
         onToday={onToday}
         onPrevMonth={onPrevMonth}
         onNextMonth={onNextMonth}
@@ -147,11 +147,6 @@ export function CalendarPage() {
         />
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[#131314] pr-14">
-          <div className="flex shrink-0 items-start justify-between pl-[120px] pr-24 pb-12 pt-10">
-            <div className="text-[54px] font-medium leading-none tracking-wide text-[#e3e3e3]">
-              {format(today, 'd')}
-            </div>
-          </div>
           <div className="min-h-0 flex-1 pl-14 pr-[52px]">
             <MonthGrid
               month={month}
