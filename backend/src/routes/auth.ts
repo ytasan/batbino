@@ -34,7 +34,7 @@ router.post("/register", async (req, res) => {
         create: [
           { name: "technical", color: "#fa903e", isVisibleDefault: false },
           { name: "general", color: GENERAL_CALENDAR_COLOR, isVisibleDefault: true },
-          { name: "trivia", color: "#4285f4", isVisibleDefault: true },
+          { name: "constant", color: "#f9d71c", isVisibleDefault: true },
         ],
       },
     },
