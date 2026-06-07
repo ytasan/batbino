@@ -23,10 +23,14 @@ import {
   type CalendarListItem,
   type EventApi,
 } from '@/lib/api'
+import {
+  readCalendarVisibility,
+  writeCalendarVisibility,
+} from '@/lib/calendarVisibility'
 import { useAuth } from '@/context/AuthContext'
 
 export function CalendarPage() {
-  const { token, logout } = useAuth()
+  const { token, logout, user } = useAuth()
   const today = new Date()
   const [month, setMonth] = useState(() => startOfMo(new Date()))
   const [selectedDate, setSelectedDate] = useState(() => new Date())
@@ -53,14 +57,17 @@ export function CalendarPage() {
       const calList = await fetchCalendars()
       setCalendars(calList)
       setVisibleById((prev) => {
+        const stored = user?.id ? readCalendarVisibility(user.id) : {}
         const next = { ...prev }
-        for (const c of calList) if (next[c.id] === undefined) next[c.id] = c.isVisibleDefault
+        for (const c of calList) {
+          if (next[c.id] === undefined) next[c.id] = stored[c.id] ?? c.isVisibleDefault
+        }
         return next
       })
     } catch (e) {
       setLoadErr(e instanceof Error ? e.message : 'Failed to load calendars')
     }
-  }, [token])
+  }, [token, user?.id])
 
   const reloadEvents = useCallback(async () => {
     if (!token) return
@@ -115,7 +122,11 @@ export function CalendarPage() {
   }
 
   function onToggleCalendar(id: string, next: boolean) {
-    setVisibleById((prev) => ({ ...prev, [id]: next }))
+    setVisibleById((prev) => {
+      const updated = { ...prev, [id]: next }
+      if (user?.id) writeCalendarVisibility(user.id, updated)
+      return updated
+    })
   }
 
   function onSelectDay(d: Date) {
