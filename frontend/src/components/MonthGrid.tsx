@@ -12,6 +12,7 @@ import {
 } from 'date-fns'
 import { useMemo, useRef, useState } from 'react'
 
+import { DayTasksDialog } from '@/components/DayTasksDialog'
 import type { EventApi } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -48,6 +49,7 @@ export function MonthGrid({
   visibleCalendarIds,
 }: MonthGridProps) {
   const [dropTargetKey, setDropTargetKey] = useState<string | null>(null)
+  const [moreTasksDay, setMoreTasksDay] = useState<Date | null>(null)
   const dragActiveRef = useRef(false)
 
   const { weeks, weekdays } = useMemo(() => {
@@ -196,9 +198,16 @@ export function MonthGrid({
                         </div>
                       ))}
                       {dayEvts.length > 3 ? (
-                        <span className="px-1 text-[11px] text-[#8ab4f8]">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setMoreTasksDay(d)
+                          }}
+                          className="cursor-pointer px-1 text-left text-[11px] text-[#8ab4f8] hover:underline"
+                        >
                           +{dayEvts.length - 3} more
-                        </span>
+                        </button>
                       ) : null}
                     </div>
                   </div>
@@ -208,6 +217,20 @@ export function MonthGrid({
           )
         })}
       </div>
+
+      <DayTasksDialog
+        open={moreTasksDay !== null}
+        onOpenChange={(open) => {
+          if (!open) setMoreTasksDay(null)
+        }}
+        day={moreTasksDay}
+        tasks={
+          moreTasksDay
+            ? (eventsByDay.get(format(moreTasksDay, 'yyyy-MM-dd')) ?? [])
+            : []
+        }
+        onSelectTask={onSelectTask}
+      />
     </div>
   )
 }
