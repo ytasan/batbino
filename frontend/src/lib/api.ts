@@ -94,11 +94,16 @@ export async function fetchEvents(
   from: Date,
   to: Date,
   calendarIds?: string[],
+  q?: string,
 ): Promise<EventApi[]> {
-  const params = new URLSearchParams({
-    from: from.toISOString(),
-    to: to.toISOString(),
-  })
+  const params = new URLSearchParams()
+  const trimmed = q?.trim()
+  if (trimmed) {
+    params.set('q', trimmed)
+  } else {
+    params.set('from', from.toISOString())
+    params.set('to', to.toISOString())
+  }
   if (calendarIds?.length) params.set('calendarIds', calendarIds.join(','))
   const res = await fetch(`${getBase()}/events?${params}`, { headers: headers() })
   if (!res.ok) throw new Error(await parseError(res))

@@ -1,6 +1,7 @@
+import { format, parseISO } from 'date-fns'
 import { Plus } from 'lucide-react'
 
-import type { CalendarListItem } from '@/lib/api'
+import type { CalendarListItem, EventApi } from '@/lib/api'
 import { MiniCalendar } from '@/components/MiniCalendar'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -15,6 +16,10 @@ type SidebarProps = {
   visibleById: Record<string, boolean>
   onToggleCalendar: (id: string, next: boolean) => void
   onCreateClick: () => void
+  searchQuery: string
+  onSearchQueryChange: (query: string) => void
+  searchResults: EventApi[]
+  onSelectSearchResult: (task: EventApi) => void
 }
 
 export function Sidebar({
@@ -27,6 +32,10 @@ export function Sidebar({
   visibleById,
   onToggleCalendar,
   onCreateClick,
+  searchQuery,
+  onSearchQueryChange,
+  searchResults,
+  onSelectSearchResult,
 }: SidebarProps) {
   return (
     <aside className="flex h-full w-[272px] shrink-0 flex-col overflow-y-auto border-r border-[#3c4043] bg-[#1e1f20]">
@@ -54,7 +63,41 @@ export function Sidebar({
       />
 
       <div className="px-4 pb-3">
-        <Input readOnly placeholder="Search" className="h-11 cursor-default" />
+        <Input
+          value={searchQuery}
+          onChange={(e) => onSearchQueryChange(e.target.value)}
+          placeholder="Search"
+          className="h-11"
+          aria-label="Search tasks"
+        />
+        {searchQuery.trim() ? (
+          <div className="mt-2 max-h-48 overflow-y-auto rounded-md border border-[#3c4043] bg-[#131314]">
+            {searchResults.length ? (
+              searchResults.map((task) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  onClick={() => onSelectSearchResult(task)}
+                  className="flex w-full items-start gap-2 border-b border-[#3c4043] px-3 py-2 text-left last:border-b-0 hover:bg-[#292a2d]"
+                >
+                  <span
+                    className="mt-1 h-3 w-3 shrink-0 rounded-sm"
+                    style={{ backgroundColor: task.calendar.color || '#4285f4' }}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13px] text-[#e3e3e3]">{task.title}</span>
+                    <span className="block truncate text-[11px] text-[#80868b]">
+                      {format(parseISO(task.startAt), 'MMM d, yyyy')}
+                      {task.description ? ` · ${task.description}` : ''}
+                    </span>
+                  </span>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-[12px] text-[#80868b]">No matching tasks</div>
+            )}
+          </div>
+        ) : null}
       </div>
 
       <div className="px-8 pb-2 pt-1 text-xs font-semibold uppercase tracking-[0.025em] text-[#bdc1c6]">

@@ -43,6 +43,8 @@ export function CalendarPage() {
   const [selectedTask, setSelectedTask] = useState<EventApi | null>(null)
   const [taskDetailOpen, setTaskDetailOpen] = useState(false)
   const [loadErr, setLoadErr] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
 
   const visibleCalendarIds = useMemo(() => {
     const ids = new Set<string>()
@@ -52,6 +54,11 @@ export function CalendarPage() {
     }
     return ids
   }, [calendars, visibleById])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(searchQuery.trim()), 300)
+    return () => window.clearTimeout(timer)
+  }, [searchQuery])
 
   const refreshLists = useCallback(async () => {
     if (!token) return
@@ -83,12 +90,17 @@ export function CalendarPage() {
 
     try {
       const activeIds = Array.from(visibleCalendarIds)
-      const list = await fetchEvents(from, toExclusive, activeIds.length ? activeIds : undefined)
+      const list = await fetchEvents(
+        from,
+        toExclusive,
+        activeIds.length ? activeIds : undefined,
+        debouncedSearch || undefined,
+      )
       setEvents(list)
     } catch (e) {
       setLoadErr(e instanceof Error ? e.message : 'Failed to load events')
     }
-  }, [token, month, calendars, visibleCalendarIds])
+  }, [token, month, calendars, visibleCalendarIds, debouncedSearch])
 
   useEffect(() => {
     void refreshLists()
@@ -168,6 +180,14 @@ export function CalendarPage() {
     ? calendars.filter((c) => visibleById[c.id] ?? c.isVisibleDefault)
     : calendars
 
+  function onSelectSearchResult(task: EventApi) {
+    const taskDay = parseISO(task.startAt)
+    setSelectedDate(taskDay)
+    setMonth(startOfMo(taskDay))
+    setSelectedTask(task)
+    setTaskDetailOpen(true)
+  }
+
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#131314] text-[#e3e3e3]">
       <TopBar
@@ -197,6 +217,10 @@ export function CalendarPage() {
           visibleById={visibleById}
           onToggleCalendar={onToggleCalendar}
           onCreateClick={() => setCreateOpen(true)}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          searchResults={debouncedSearch ? events : []}
+          onSelectSearchResult={onSelectSearchResult}
         />
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[#131314] pr-14">

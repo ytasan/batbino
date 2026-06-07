@@ -8,13 +8,9 @@ const router = Router();
 router.use(requireAuth);
 
 router.get("/", async (req, res) => {
+  const q = req.query.q ? String(req.query.q).trim() : "";
   const from = req.query.from ? new Date(String(req.query.from)) : null;
   const to = req.query.to ? new Date(String(req.query.to)) : null;
-
-  if (!from || !to || Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
-    res.status(400).json({ error: "from and to ISO dates are required" });
-    return;
-  }
 
   const calendarIds = req.query.calendarIds
     ? String(req.query.calendarIds)
@@ -31,6 +27,44 @@ router.get("/", async (req, res) => {
     : {
         calendar: { userId: req.user!.id },
       };
+
+  if (q) {
+    const events = await prisma.event.findMany({
+      where: {
+        ...baseWhere,
+        OR: [
+          { title: { contains: q, mode: "insensitive" } },
+          { description: { contains: q, mode: "insensitive" } },
+          { calendar: { name: { contains: q, mode: "insensitive" } } },
+        ],
+      },
+      orderBy: { startAt: "asc" },
+      include: {
+        calendar: {
+          select: { id: true, name: true, color: true },
+        },
+      },
+    });
+
+    res.json(
+      events.map((e) => ({
+        id: e.id,
+        calendarId: e.calendarId,
+        title: e.title,
+        description: e.description,
+        startAt: e.startAt.toISOString(),
+        endAt: e.endAt.toISOString(),
+        allDay: e.allDay,
+        calendar: e.calendar,
+      })),
+    );
+    return;
+  }
+
+  if (!from || !to || Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+    res.status(400).json({ error: "from and to ISO dates are required" });
+    return;
+  }
 
   const events = await prisma.event.findMany({
     where: {
