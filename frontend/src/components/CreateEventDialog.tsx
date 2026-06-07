@@ -152,26 +152,43 @@ export function CreateEventDialog({
               All day
             </Label>
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
+          {allDay ? (
             <div className="grid gap-2">
-              <Label htmlFor="evt-start">Start</Label>
+              <Label htmlFor="evt-date">Date</Label>
               <Input
-                id="evt-start"
-                type="datetime-local"
-                value={startLocal}
-                onChange={(x) => setStartLocal(x.target.value)}
+                id="evt-date"
+                type="date"
+                value={startLocal.slice(0, 10)}
+                onChange={(x) => {
+                  const day = new Date(`${x.target.value}T00:00:00`)
+                  const { start: dayStart, end: dayEnd } = allDayRange(day)
+                  setStartLocal(toLocalDatetimeValue(dayStart))
+                  setEndLocal(toLocalDatetimeValue(dayEnd))
+                }}
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="evt-end">End</Label>
-              <Input
-                id="evt-end"
-                type="datetime-local"
-                value={endLocal}
-                onChange={(x) => setEndLocal(x.target.value)}
-              />
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="evt-start">Start</Label>
+                <Input
+                  id="evt-start"
+                  type="datetime-local"
+                  value={startLocal}
+                  onChange={(x) => setStartLocal(x.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="evt-end">End</Label>
+                <Input
+                  id="evt-end"
+                  type="datetime-local"
+                  value={endLocal}
+                  onChange={(x) => setEndLocal(x.target.value)}
+                />
+              </div>
             </div>
-          </div>
+          )}
           {error ? <p className="text-sm text-red-400">{error}</p> : null}
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="default" className="min-w-[88px]" onClick={() => onOpenChange(false)}>

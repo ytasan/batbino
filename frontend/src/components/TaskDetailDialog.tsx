@@ -208,26 +208,43 @@ export function TaskDetailDialog({
             </Label>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
+          {allDay ? (
             <div className="grid gap-2">
-              <Label htmlFor="task-start">Start</Label>
+              <Label htmlFor="task-date">Date</Label>
               <Input
-                id="task-start"
-                type="datetime-local"
-                value={startLocal}
-                onChange={(x) => setStartLocal(x.target.value)}
+                id="task-date"
+                type="date"
+                value={startLocal.slice(0, 10)}
+                onChange={(x) => {
+                  const day = new Date(`${x.target.value}T00:00:00`)
+                  const { start: dayStart, end: dayEnd } = allDayRange(day)
+                  setStartLocal(toLocalDatetimeValue(dayStart))
+                  setEndLocal(toLocalDatetimeValue(dayEnd))
+                }}
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="task-end">End</Label>
-              <Input
-                id="task-end"
-                type="datetime-local"
-                value={endLocal}
-                onChange={(x) => setEndLocal(x.target.value)}
-              />
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="task-start">Start</Label>
+                <Input
+                  id="task-start"
+                  type="datetime-local"
+                  value={startLocal}
+                  onChange={(x) => setStartLocal(x.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="task-end">End</Label>
+                <Input
+                  id="task-end"
+                  type="datetime-local"
+                  value={endLocal}
+                  onChange={(x) => setEndLocal(x.target.value)}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="grid gap-2">
             <Label htmlFor="task-desc">Description</Label>
