@@ -35,6 +35,12 @@ import {
 import { useAuth } from '@/context/AuthContext'
 import { exportTasksToJson, importTasksFromJsonFile } from '@/lib/taskExportImport'
 
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  const tag = target.tagName
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
+}
+
 export function CalendarPage() {
   const { token, logout, user } = useAuth()
   const today = new Date()
@@ -117,26 +123,47 @@ export function CalendarPage() {
     void reloadEvents()
   }, [reloadEvents])
 
+  const onPrevMonth = useCallback(() => {
+    setSlideDirection('right')
+    setMonth((prev) => {
+      const d = startOfMo(prev)
+      d.setMonth(d.getMonth() - 1)
+      return startOfMo(d)
+    })
+  }, [])
+
+  const onNextMonth = useCallback(() => {
+    setSlideDirection('left')
+    setMonth((prev) => {
+      const d = startOfMo(prev)
+      d.setMonth(d.getMonth() + 1)
+      return startOfMo(d)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!token) return
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+      if (createOpen || taskDetailOpen) return
+      if (isTypingTarget(e.target)) return
+
+      e.preventDefault()
+      if (e.key === 'ArrowLeft') onPrevMonth()
+      else onNextMonth()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [token, createOpen, taskDetailOpen, onPrevMonth, onNextMonth])
+
   if (!token) return <Navigate to="/login" replace />
 
   function onToday() {
     const n = new Date()
     setMonth(startOfMo(n))
     setSelectedDate(n)
-  }
-
-  function onPrevMonth() {
-    setSlideDirection('right')
-    const d = startOfMo(month)
-    d.setMonth(d.getMonth() - 1)
-    setMonth(startOfMo(d))
-  }
-
-  function onNextMonth() {
-    setSlideDirection('left')
-    const d = startOfMo(month)
-    d.setMonth(d.getMonth() + 1)
-    setMonth(startOfMo(d))
   }
 
   function onNavigateSidebarMonth(delta: number) {
