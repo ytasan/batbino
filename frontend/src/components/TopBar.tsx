@@ -9,6 +9,12 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 type TopBarProps = {
   month: Date
@@ -17,9 +23,20 @@ type TopBarProps = {
   onPrevMonth: () => void
   onNextMonth: () => void
   onSignOut: () => void
+  onExportTasks: () => void
+  onImportTasks: () => void
 }
 
-export function TopBar({ month, today, onToday, onPrevMonth, onNextMonth, onSignOut }: TopBarProps) {
+export function TopBar({
+  month,
+  today,
+  onToday,
+  onPrevMonth,
+  onNextMonth,
+  onSignOut,
+  onExportTasks,
+  onImportTasks,
+}: TopBarProps) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-[#3c4043] px-3 pl-4">
       <div className="flex min-w-0 items-center gap-1">
@@ -63,9 +80,17 @@ export function TopBar({ month, today, onToday, onPrevMonth, onNextMonth, onSign
         <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Help">
           <HelpCircle className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Settings">
-          <Settings className="h-5 w-5" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Settings">
+              <Settings className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={onExportTasks}>Export tasks as JSON</DropdownMenuItem>
+            <DropdownMenuItem onSelect={onImportTasks}>Import tasks from JSON</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           variant="default"
           size="sm"

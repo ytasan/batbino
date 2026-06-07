@@ -9,7 +9,7 @@ import {
 } from 'date-fns'
 import { CheckSquare, MapPin, NotebookPen, Plus, UserRound } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 
 import { CreateEventDialog } from '@/components/CreateEventDialog'
@@ -29,6 +29,7 @@ import {
   writeCalendarVisibility,
 } from '@/lib/calendarVisibility'
 import { useAuth } from '@/context/AuthContext'
+import { exportTasksToJson, importTasksFromJsonFile } from '@/lib/taskExportImport'
 
 export function CalendarPage() {
   const { token, logout, user } = useAuth()
@@ -45,6 +46,7 @@ export function CalendarPage() {
   const [loadErr, setLoadErr] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const importInputRef = useRef<HTMLInputElement>(null)
 
   const visibleCalendarIds = useMemo(() => {
     const ids = new Set<string>()
@@ -189,8 +191,43 @@ export function CalendarPage() {
     setTaskDetailOpen(true)
   }
 
+  async function onExportTasks() {
+    setLoadErr(null)
+    try {
+      await exportTasksToJson()
+    } catch (e) {
+      setLoadErr(e instanceof Error ? e.message : 'Failed to export tasks')
+    }
+  }
+
+  function onImportTasks() {
+    importInputRef.current?.click()
+  }
+
+  async function onImportFileSelected(file: File | undefined) {
+    if (!file) return
+    setLoadErr(null)
+    try {
+      const count = await importTasksFromJsonFile(file)
+      await refreshLists()
+      await reloadEvents()
+      window.alert(`Imported ${count} task${count === 1 ? '' : 's'}.`)
+    } catch (e) {
+      setLoadErr(e instanceof Error ? e.message : 'Failed to import tasks')
+    } finally {
+      if (importInputRef.current) importInputRef.current.value = ''
+    }
+  }
+
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#131314] text-[#e3e3e3]">
+      <input
+        ref={importInputRef}
+        type="file"
+        accept="application/json,.json"
+        className="hidden"
+        onChange={(e) => void onImportFileSelected(e.target.files?.[0])}
+      />
       <TopBar
         month={month}
         today={today}
@@ -198,6 +235,8 @@ export function CalendarPage() {
         onPrevMonth={onPrevMonth}
         onNextMonth={onNextMonth}
         onSignOut={() => logout()}
+        onExportTasks={() => void onExportTasks()}
+        onImportTasks={onImportTasks}
       />
       {loadErr ? (
         <div className="border-b border-[#3c4043] bg-[#2d2e31] px-4 py-3 text-[14px] text-[#f28b82]">

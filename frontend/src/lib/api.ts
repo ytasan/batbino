@@ -90,6 +90,20 @@ export async function fetchCalendars(): Promise<CalendarListItem[]> {
   return res.json()
 }
 
+export async function createCalendarApi(payload: {
+  name: string
+  color?: string
+  isVisibleDefault?: boolean
+}): Promise<CalendarListItem> {
+  const res = await fetch(`${getBase()}/calendars`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) throw new Error(await parseError(res))
+  return res.json()
+}
+
 export async function fetchEvents(
   from: Date,
   to: Date,
