@@ -1,3 +1,4 @@
+// REST routes for tasks. Path and Prisma model remain "event" for compatibility.
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireAuth } from "../middleware/auth.js";

@@ -2,6 +2,10 @@
 
 Full-stack calendar and task MVP: React + Vite frontend, Express + Prisma + PostgreSQL backend.
 
+## Terminology
+
+In product and UI copy, calendar items are called **tasks**. The codebase still uses `Event`, `/events`, and `events` in the database and API — treat those names as the technical implementation of a task.
+
 ## Prerequisites
 
 - Node.js 20+
@@ -46,7 +50,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`, register or sign in, then use **Create** to add events.
+Open `http://localhost:5173`, register or sign in, then use **Create** to add tasks.
 
 ## Scripts
 
@@ -71,4 +75,4 @@ batbino/
 
 - `POST /auth/register`, `POST /auth/login` — JWT
 - `GET|POST|PATCH|DELETE /calendars` — user calendars (auth)
-- `GET|POST|PATCH|DELETE /events` — events; `GET /events?from=&to=` with optional `calendarIds`
+- `GET|POST|PATCH|DELETE /events` — tasks (stored as `Event`); `GET /events?from=&to=` with optional `calendarIds`

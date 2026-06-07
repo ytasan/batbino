@@ -1,3 +1,4 @@
+// Dialog to create a task. Component and API names still use "event" internally.
 import { useEffect, useState } from 'react'
 
 import type { CalendarListItem } from '@/lib/api'

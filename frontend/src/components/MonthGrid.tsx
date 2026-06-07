@@ -28,6 +28,7 @@ type MonthGridProps = {
   today: Date
   selectedDate: Date
   onSelectDay: (d: Date) => void
+  /** Tasks to render in day cells (prop name matches API: events). */
   events: EventApi[]
   visibleCalendarIds: Set<string>
 }

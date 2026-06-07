@@ -25,6 +25,7 @@ export function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(() => new Date())
   const [calendars, setCalendars] = useState<CalendarListItem[]>([])
   const [visibleById, setVisibleById] = useState<Record<string, boolean>>({})
+  // Tasks loaded from /events (EventApi).
   const [events, setEvents] = useState<EventApi[]>([])
   const [createOpen, setCreateOpen] = useState(false)
   const [loadErr, setLoadErr] = useState<string | null>(null)

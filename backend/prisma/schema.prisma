@@ -28,6 +28,7 @@ model Calendar {
   @@map("calendars")
 }
 
+// Product term: task. Kept as Event in schema/API for historical naming.
 model Event {
   id          String   @id @default(cuid())
   calendarId  String   @map("calendar_id")

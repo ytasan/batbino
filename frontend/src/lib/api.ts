@@ -5,6 +5,7 @@ export type CalendarListItem = {
   isVisibleDefault: boolean
 }
 
+/** API shape for a calendar task (backend model/route name: Event / /events). */
 export type EventApi = {
   id: string
   calendarId: string
