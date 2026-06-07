@@ -110,6 +110,11 @@ export function CalendarPage() {
     setVisibleById((prev) => ({ ...prev, [id]: next }))
   }
 
+  function onSelectDay(d: Date) {
+    setSelectedDate(d)
+    setCreateOpen(true)
+  }
+
   const calendarOptionsForModal = calendars.filter(
     (c) => visibleById[c.id] ?? c.isVisibleDefault,
   ).length
@@ -152,7 +157,7 @@ export function CalendarPage() {
               month={month}
               today={today}
               selectedDate={selectedDate}
-              onSelectDay={setSelectedDate}
+              onSelectDay={onSelectDay}
               events={events}
               visibleCalendarIds={visibleCalendarIds}
             />
