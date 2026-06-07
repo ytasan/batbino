@@ -16,9 +16,10 @@ type TopBarProps = {
   onToday: () => void
   onPrevMonth: () => void
   onNextMonth: () => void
+  onSignOut: () => void
 }
 
-export function TopBar({ month, today, onToday, onPrevMonth, onNextMonth }: TopBarProps) {
+export function TopBar({ month, today, onToday, onPrevMonth, onNextMonth, onSignOut }: TopBarProps) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-[#3c4043] px-3 pl-4">
       <div className="flex min-w-0 items-center gap-1">
@@ -47,6 +48,15 @@ export function TopBar({ month, today, onToday, onPrevMonth, onNextMonth }: TopB
         </h1>
       </div>
       <div className="flex shrink-0 items-center gap-1 pr-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mr-2 text-[#bdc1c6]"
+          type="button"
+          onClick={onSignOut}
+        >
+          Sign out
+        </Button>
         <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Search">
           <Search className="h-5 w-5" />
         </Button>

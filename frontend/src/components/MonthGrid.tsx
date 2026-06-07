@@ -84,7 +84,7 @@ export function MonthGrid({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#131314]">
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[#131314]">
       <div className="grid shrink-0 grid-cols-[40px_repeat(7,minmax(0,1fr))] border-b border-[#3c4043] text-center text-[11px] font-medium text-[#bdc1c6]">
         <div />
         {weekdays.map((d) => (
@@ -93,15 +93,15 @@ export function MonthGrid({
           </div>
         ))}
       </div>
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {weeks.map((weekDays) => {
           const isoWeek = getISOWeek(weekDays[0])
           return (
             <div
               key={weekDays[0].toISOString()}
-              className="grid grid-cols-[40px_repeat(7,minmax(0,1fr))]"
+              className="grid min-h-0 flex-1 grid-cols-[40px_repeat(7,minmax(0,1fr))]"
             >
-              <div className="flex items-start justify-center border-b border-[#3c4043] py-4 text-[11px] text-[#80868b]">
+              <div className="flex h-full items-start justify-center border-b border-[#3c4043] pt-4 text-[11px] text-[#80868b]">
                 <span>W{isoWeek}</span>
               </div>
               {weekDays.map((d) => {
@@ -146,7 +146,7 @@ export function MonthGrid({
                       endDrag()
                     }}
                     className={cn(
-                      'relative min-h-[104px] cursor-pointer border-b border-l border-[#3c4043] p-1 text-left align-top transition-colors hover:bg-[#1f1f1f]',
+                      'relative h-full min-h-0 cursor-pointer border-b border-l border-[#3c4043] p-1 text-left align-top transition-colors hover:bg-[#1f1f1f]',
                       sel && 'ring-2 ring-[#8ab4f8] ring-offset-[-2px]',
                       isDropTarget && 'bg-[#292a2d] ring-2 ring-[#8ab4f8] ring-offset-[-2px]',
                     )}

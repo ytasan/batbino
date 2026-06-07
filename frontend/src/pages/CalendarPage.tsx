@@ -16,7 +16,6 @@ import { CreateEventDialog } from '@/components/CreateEventDialog'
 import { MonthGrid } from '@/components/MonthGrid'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
-import { Button } from '@/components/ui/button'
 import {
   fetchCalendars,
   fetchEvents,
@@ -163,6 +162,7 @@ export function CalendarPage() {
         onToday={onToday}
         onPrevMonth={onPrevMonth}
         onNextMonth={onNextMonth}
+        onSignOut={() => logout()}
       />
       {loadErr ? (
         <div className="border-b border-[#3c4043] bg-[#2d2e31] px-4 py-3 text-[14px] text-[#f28b82]">
@@ -186,7 +186,7 @@ export function CalendarPage() {
         />
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[#131314] pr-14">
-          <div className="min-h-0 flex-1 pl-14 pr-[52px]">
+          <div className="flex min-h-0 flex-1 flex-col pl-14 pr-[52px]">
             <MonthGrid
               month={month}
               today={today}
@@ -219,12 +219,6 @@ export function CalendarPage() {
             </button>
           </aside>
         </div>
-      </div>
-
-      <div className="absolute bottom-6 right-[88px] z-10">
-        <Button variant="ghost" size="sm" className="text-[#bdc1c6]" type="button" onClick={() => logout()}>
-          Sign out
-        </Button>
       </div>
 
       <CreateEventDialog
