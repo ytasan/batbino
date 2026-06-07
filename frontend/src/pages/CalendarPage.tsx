@@ -15,6 +15,10 @@ import { Navigate } from 'react-router-dom'
 import { CreateEventDialog } from '@/components/CreateEventDialog'
 import { TaskDetailDialog } from '@/components/TaskDetailDialog'
 import { MonthGrid } from '@/components/MonthGrid'
+import {
+  MonthSlideTransition,
+  type MonthSlideDirection,
+} from '@/components/MonthSlideTransition'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import {
@@ -35,6 +39,7 @@ export function CalendarPage() {
   const { token, logout, user } = useAuth()
   const today = new Date()
   const [month, setMonth] = useState(() => startOfMo(new Date()))
+  const [slideDirection, setSlideDirection] = useState<MonthSlideDirection | null>(null)
   const [selectedDate, setSelectedDate] = useState(() => new Date())
   const [calendars, setCalendars] = useState<CalendarListItem[]>([])
   const [visibleById, setVisibleById] = useState<Record<string, boolean>>({})
@@ -121,12 +126,14 @@ export function CalendarPage() {
   }
 
   function onPrevMonth() {
+    setSlideDirection('right')
     const d = startOfMo(month)
     d.setMonth(d.getMonth() - 1)
     setMonth(startOfMo(d))
   }
 
   function onNextMonth() {
+    setSlideDirection('left')
     const d = startOfMo(month)
     d.setMonth(d.getMonth() + 1)
     setMonth(startOfMo(d))
@@ -264,20 +271,28 @@ export function CalendarPage() {
         />
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[#131314] pr-14">
-          <div className="flex min-h-0 flex-1 flex-col pl-14 pr-[52px]">
-            <MonthGrid
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden pl-14 pr-[52px]">
+            <MonthSlideTransition
               month={month}
-              today={today}
-              selectedDate={selectedDate}
-              onSelectDay={onSelectDay}
-              onSelectTask={(task) => {
-                setSelectedTask(task)
-                setTaskDetailOpen(true)
-              }}
-              onMoveTask={(taskId, targetDay) => void onMoveTask(taskId, targetDay)}
-              events={events}
-              visibleCalendarIds={visibleCalendarIds}
-            />
+              direction={slideDirection}
+              onTransitionComplete={() => setSlideDirection(null)}
+            >
+              {(displayMonth) => (
+                <MonthGrid
+                  month={displayMonth}
+                  today={today}
+                  selectedDate={selectedDate}
+                  onSelectDay={onSelectDay}
+                  onSelectTask={(task) => {
+                    setSelectedTask(task)
+                    setTaskDetailOpen(true)
+                  }}
+                  onMoveTask={(taskId, targetDay) => void onMoveTask(taskId, targetDay)}
+                  events={events}
+                  visibleCalendarIds={visibleCalendarIds}
+                />
+              )}
+            </MonthSlideTransition>
           </div>
           <aside className="absolute right-6 top-[120px] flex w-[56px] flex-col items-center gap-10 px-3 text-[#bdc1c6]">
             <NavIcon ariaLabel="Notebook">
