@@ -7,8 +7,6 @@ import {
   startOfMonth as startOfMo,
   startOfWeek,
 } from 'date-fns'
-import { CheckSquare, MapPin, NotebookPen, Plus, UserRound } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 
@@ -19,8 +17,11 @@ import {
   MonthSlideTransition,
   type MonthSlideDirection,
 } from '@/components/MonthSlideTransition'
+import { RightSidebar } from '@/components/RightSidebar'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
+import { usePersistedBoolean } from '@/lib/usePersistedBoolean'
+import { cn } from '@/lib/utils'
 import {
   deleteEventApi,
   fetchCalendars,
@@ -59,6 +60,10 @@ export function CalendarPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const importInputRef = useRef<HTMLInputElement>(null)
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = usePersistedBoolean(
+    'batbino.rightSidebar.collapsed',
+    false,
+  )
 
   const visibleCalendarIds = useMemo(() => {
     const ids = new Set<string>()
@@ -310,8 +315,18 @@ export function CalendarPage() {
           onSelectSearchResult={onSelectSearchResult}
         />
 
-        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-[#131314] pr-14">
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden pl-14 pr-[52px]">
+        <div
+          className={cn(
+            'relative flex min-h-0 min-w-0 flex-1 flex-col bg-[#131314]',
+            rightSidebarCollapsed ? 'pr-0' : 'pr-14',
+          )}
+        >
+          <div
+            className={cn(
+              'flex min-h-0 flex-1 flex-col overflow-hidden pl-14',
+              rightSidebarCollapsed ? 'pr-4' : 'pr-[52px]',
+            )}
+          >
             <MonthSlideTransition
               month={month}
               direction={slideDirection}
@@ -335,27 +350,10 @@ export function CalendarPage() {
               )}
             </MonthSlideTransition>
           </div>
-          <aside className="absolute right-6 top-[120px] flex w-[56px] flex-col items-center gap-10 px-3 text-[#bdc1c6]">
-            <NavIcon ariaLabel="Notebook">
-              <NotebookPen className="h-[28px] w-[28px]" strokeWidth={1.5} />
-            </NavIcon>
-            <NavIcon ariaLabel="Tasks">
-              <CheckSquare className="h-[28px] w-[28px]" strokeWidth={1.5} />
-            </NavIcon>
-            <NavIcon ariaLabel="Contacts">
-              <UserRound className="h-[28px] w-[28px]" strokeWidth={1.5} />
-            </NavIcon>
-            <NavIcon ariaLabel="Maps">
-              <MapPin className="h-[28px] w-[28px]" strokeWidth={1.5} />
-            </NavIcon>
-            <button
-              type="button"
-              className="mt-3 flex h-[52px] w-[52px] items-center justify-center rounded-full border border-dashed border-[#5f6368] text-[#bdc1c6] transition-colors hover:border-[#8ab4f8] hover:text-[#8ab4f8]"
-              aria-label="Add shortcut"
-            >
-              <Plus className="h-8 w-8" strokeWidth={1.5} />
-            </button>
-          </aside>
+          <RightSidebar
+            collapsed={rightSidebarCollapsed}
+            onCollapsedChange={setRightSidebarCollapsed}
+          />
         </div>
       </div>
 
@@ -379,17 +377,5 @@ export function CalendarPage() {
         onMoveTask={onMoveTask}
       />
     </div>
-  )
-}
-
-function NavIcon({ children, ariaLabel }: { children: ReactNode; ariaLabel: string }) {
-  return (
-    <button
-      type="button"
-      className="flex h-12 w-12 items-center justify-center rounded-[10px] text-[#bdc1c6] hover:bg-[#292a2d]"
-      aria-label={ariaLabel}
-    >
-      {children}
-    </button>
   )
 }
