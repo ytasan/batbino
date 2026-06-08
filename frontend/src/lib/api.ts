@@ -14,6 +14,7 @@ export type EventApi = {
   startAt: string
   endAt: string
   allDay: boolean
+  done: boolean
   calendar: Pick<CalendarListItem, 'id' | 'name' | 'color'>
 }
 
@@ -149,6 +150,7 @@ export async function updateEventApi(
     startAt?: string
     endAt?: string
     allDay?: boolean
+    done?: boolean
     calendarId?: string
   },
 ): Promise<EventApi> {

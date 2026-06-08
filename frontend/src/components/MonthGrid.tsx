@@ -35,6 +35,7 @@ type MonthGridProps = {
   onSelectDay: (d: Date) => void
   onSelectTask: (task: EventApi) => void
   onMoveTask: (taskId: string, targetDay: Date) => void
+  onMarkDone: (task: EventApi) => void
   onDeleteTask: (task: EventApi) => void
   /** Tasks to render in day cells (prop name matches API: events). */
   events: EventApi[]
@@ -48,6 +49,7 @@ export function MonthGrid({
   onSelectDay,
   onSelectTask,
   onMoveTask,
+  onMarkDone,
   onDeleteTask,
   events,
   visibleCalendarIds,
@@ -217,7 +219,10 @@ export function MonthGrid({
                               task: ev,
                             })
                           }}
-                          className="cursor-pointer truncate rounded-sm px-1 py-0.5 text-left text-[12px] leading-tight text-[#e3e3e3] active:cursor-grabbing"
+                          className={cn(
+                            'cursor-pointer truncate rounded-sm px-1 py-0.5 text-left text-[12px] leading-tight text-[#e3e3e3] active:cursor-grabbing',
+                            ev.done && 'line-through opacity-60',
+                          )}
                           style={{
                             backgroundColor: `${ev.calendar.color}33`,
                             borderLeft: `3px solid ${ev.calendar.color}`,
@@ -261,6 +266,7 @@ export function MonthGrid({
         }
         onSelectTask={onSelectTask}
         onMoveTask={onMoveTask}
+        onMarkDone={onMarkDone}
         onDeleteTask={onDeleteTask}
       />
 
@@ -270,6 +276,7 @@ export function MonthGrid({
           y={contextMenu.y}
           task={contextMenu.task}
           onMoveTask={onMoveTask}
+          onMarkDone={onMarkDone}
           onEdit={onSelectTask}
           onDelete={onDeleteTask}
           onClose={() => setContextMenu(null)}

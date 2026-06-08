@@ -112,7 +112,7 @@ export function Sidebar({
                         style={{ backgroundColor: task.calendar.color || '#4285f4' }}
                       />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] text-[#e3e3e3]">{task.title}</span>
+                        <span className={cn('block truncate text-[13px] text-[#e3e3e3]', task.done && 'line-through opacity-60')}>{task.title}</span>
                         <span className="block truncate text-[11px] text-[#80868b]">
                           {format(parseISO(task.startAt), 'MMM d, yyyy')}
                           {task.description ? ` · ${task.description}` : ''}

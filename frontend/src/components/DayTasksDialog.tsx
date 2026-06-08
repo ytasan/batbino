@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { TaskContextMenu } from '@/components/TaskContextMenu'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { EventApi } from '@/lib/api'
+import { cn } from '@/lib/utils'
 
 type DayTasksDialogProps = {
   open: boolean
@@ -12,6 +13,7 @@ type DayTasksDialogProps = {
   tasks: EventApi[]
   onSelectTask: (task: EventApi) => void
   onMoveTask: (taskId: string, targetDay: Date) => void
+  onMarkDone: (task: EventApi) => void
   onDeleteTask: (task: EventApi) => void
 }
 
@@ -22,6 +24,7 @@ export function DayTasksDialog({
   tasks,
   onSelectTask,
   onMoveTask,
+  onMarkDone,
   onDeleteTask,
 }: DayTasksDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null)
@@ -68,7 +71,10 @@ export function DayTasksDialog({
                       task: ev,
                     })
                   }}
-                  className="block w-full min-w-0 max-w-full cursor-pointer truncate rounded-sm px-2 py-1.5 text-left text-[13px] leading-tight text-[#e3e3e3] hover:brightness-110"
+                  className={cn(
+                    'block w-full min-w-0 max-w-full cursor-pointer truncate rounded-sm px-2 py-1.5 text-left text-[13px] leading-tight text-[#e3e3e3] hover:brightness-110',
+                    ev.done && 'line-through opacity-60',
+                  )}
                   style={{
                     backgroundColor: `${ev.calendar.color}33`,
                     borderLeft: `3px solid ${ev.calendar.color}`,
@@ -86,6 +92,7 @@ export function DayTasksDialog({
               y={contextMenu.y}
               task={contextMenu.task}
               onMoveTask={onMoveTask}
+              onMarkDone={onMarkDone}
               onEdit={(task) => {
                 onSelectTask(task)
                 onOpenChange(false)

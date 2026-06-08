@@ -55,6 +55,7 @@ router.get("/", async (req, res) => {
         startAt: e.startAt.toISOString(),
         endAt: e.endAt.toISOString(),
         allDay: e.allDay,
+        done: e.done,
         calendar: e.calendar,
       })),
     );
@@ -88,6 +89,7 @@ router.get("/", async (req, res) => {
       startAt: e.startAt.toISOString(),
       endAt: e.endAt.toISOString(),
       allDay: e.allDay,
+      done: e.done,
       calendar: e.calendar,
     })),
   );
@@ -141,6 +143,7 @@ router.post("/", async (req, res) => {
     startAt: event.startAt.toISOString(),
     endAt: event.endAt.toISOString(),
     allDay: event.allDay,
+    done: event.done,
     calendar: event.calendar,
   });
 });
@@ -166,6 +169,7 @@ router.patch("/:id", async (req, res) => {
   const startAt = req.body?.startAt != null ? new Date(String(req.body.startAt)) : undefined;
   const endAt = req.body?.endAt != null ? new Date(String(req.body.endAt)) : undefined;
   const allDay = req.body?.allDay != null ? Boolean(req.body.allDay) : undefined;
+  const done = req.body?.done != null ? Boolean(req.body.done) : undefined;
   const calendarId =
     req.body?.calendarId != null ? String(req.body.calendarId) : undefined;
 
@@ -196,6 +200,7 @@ router.patch("/:id", async (req, res) => {
       ...(startAt !== undefined ? { startAt } : {}),
       ...(endAt !== undefined ? { endAt } : {}),
       ...(allDay !== undefined ? { allDay } : {}),
+      ...(done !== undefined ? { done } : {}),
       ...(calendarId ? { calendarId } : {}),
     },
     include: {
@@ -211,6 +216,7 @@ router.patch("/:id", async (req, res) => {
     startAt: event.startAt.toISOString(),
     endAt: event.endAt.toISOString(),
     allDay: event.allDay,
+    done: event.done,
     calendar: event.calendar,
   });
 });

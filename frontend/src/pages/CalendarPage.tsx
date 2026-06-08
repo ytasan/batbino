@@ -201,6 +201,22 @@ export function CalendarPage() {
     }
   }
 
+  async function onMarkDone(task: EventApi) {
+    setLoadErr(null)
+    try {
+      await updateEventApi(task.id, { done: !task.done })
+      void reloadEvents()
+    } catch (e) {
+      setLoadErr(
+        e instanceof Error
+          ? e.message
+          : task.done
+            ? 'Failed to mark task as undone'
+            : 'Failed to mark task as done',
+      )
+    }
+  }
+
   async function onMoveTask(taskId: string, targetDay: Date) {
     const task = events.find((e) => e.id === taskId)
     if (!task) return
@@ -343,6 +359,7 @@ export function CalendarPage() {
                     setTaskDetailOpen(true)
                   }}
                   onMoveTask={(taskId, targetDay) => void onMoveTask(taskId, targetDay)}
+                  onMarkDone={(task) => void onMarkDone(task)}
                   onDeleteTask={(task) => void onDeleteTask(task)}
                   events={events}
                   visibleCalendarIds={visibleCalendarIds}

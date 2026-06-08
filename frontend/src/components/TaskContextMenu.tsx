@@ -8,6 +8,7 @@ type TaskContextMenuProps = {
   y: number
   task: EventApi
   onMoveTask: (taskId: string, targetDay: Date) => void
+  onMarkDone: (task: EventApi) => void
   onEdit: (task: EventApi) => void
   onDelete: (task: EventApi) => void
   onClose: () => void
@@ -18,6 +19,7 @@ export function TaskContextMenu({
   y,
   task,
   onMoveTask,
+  onMarkDone,
   onEdit,
   onDelete,
   onClose,
@@ -43,6 +45,11 @@ export function TaskContextMenu({
   function moveToNextDay() {
     const nextDay = addDays(startOfDay(parseISO(task.startAt)), 1)
     onMoveTask(task.id, nextDay)
+    onClose()
+  }
+
+  function handleToggleDone() {
+    onMarkDone(task)
     onClose()
   }
 
@@ -80,6 +87,18 @@ export function TaskContextMenu({
         }}
       >
         Move to next day
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        className={itemClass}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          handleToggleDone()
+        }}
+      >
+        {task.done ? 'Undone' : 'Done'}
       </button>
       <button
         type="button"

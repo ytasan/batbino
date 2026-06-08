@@ -37,6 +37,7 @@ model Event {
   startAt     DateTime @map("start_at")
   endAt       DateTime @map("end_at")
   allDay      Boolean  @default(false) @map("all_day")
+  done        Boolean  @default(false)
   calendar    Calendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
 
   @@map("events")
