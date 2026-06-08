@@ -207,7 +207,9 @@ export function CalendarPage() {
       })
       void reloadEvents()
     } catch (e) {
-      setLoadErr(e instanceof Error ? e.message : 'Failed to move task')
+      const message = e instanceof Error ? e.message : 'Failed to move task'
+      setLoadErr(message)
+      throw new Error(message)
     }
   }
 
@@ -362,6 +364,7 @@ export function CalendarPage() {
         task={selectedTask}
         calendars={calendarOptionsForModal}
         onUpdated={() => void reloadEvents()}
+        onMoveTask={onMoveTask}
       />
     </div>
   )

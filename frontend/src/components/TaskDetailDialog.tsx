@@ -1,4 +1,4 @@
-import { isSameDay, parseISO } from 'date-fns'
+import { addDays, isSameDay, parseISO, startOfDay } from 'date-fns'
 import { useEffect, useState } from 'react'
 
 import type { CalendarListItem, EventApi } from '@/lib/api'
@@ -42,6 +42,7 @@ type TaskDetailDialogProps = {
   task: EventApi | null
   calendars: CalendarListItem[]
   onUpdated: () => void
+  onMoveTask: (taskId: string, targetDay: Date) => Promise<void>
 }
 
 export function TaskDetailDialog({
@@ -50,6 +51,7 @@ export function TaskDetailDialog({
   task,
   calendars,
   onUpdated,
+  onMoveTask,
 }: TaskDetailDialogProps) {
   const [title, setTitle] = useState('')
   const [calendarId, setCalendarId] = useState('')
@@ -60,6 +62,7 @@ export function TaskDetailDialog({
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [moving, setMoving] = useState(false)
 
   useEffect(() => {
     if (!open || !task) return
@@ -118,6 +121,22 @@ export function TaskDetailDialog({
       setError(err instanceof Error ? err.message : 'Failed to update task')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function moveToNextDay() {
+    if (!task) return
+
+    setMoving(true)
+    setError(null)
+    try {
+      const nextDay = addDays(startOfDay(parseISO(task.startAt)), 1)
+      await onMoveTask(task.id, nextDay)
+      onOpenChange(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to move task')
+    } finally {
+      setMoving(false)
     }
   }
 
@@ -181,31 +200,42 @@ export function TaskDetailDialog({
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="task-allday"
-              checked={allDay}
-              onCheckedChange={(v) => {
-                const next = v === true
-                setAllDay(next)
-                if (next) {
-                  const start = new Date(startLocal)
-                  const { start: dayStart, end: dayEnd } = allDayRange(start)
-                  setStartLocal(toLocalDatetimeValue(dayStart))
-                  setEndLocal(toLocalDatetimeValue(dayEnd))
-                } else {
-                  const d = new Date(startLocal)
-                  d.setHours(9, 0, 0, 0)
-                  const e = new Date(d)
-                  e.setHours(10, 0, 0, 0)
-                  setStartLocal(toLocalDatetimeValue(d))
-                  setEndLocal(toLocalDatetimeValue(e))
-                }
-              }}
-            />
-            <Label htmlFor="task-allday" className="cursor-pointer font-normal">
-              All day
-            </Label>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="task-allday"
+                checked={allDay}
+                onCheckedChange={(v) => {
+                  const next = v === true
+                  setAllDay(next)
+                  if (next) {
+                    const start = new Date(startLocal)
+                    const { start: dayStart, end: dayEnd } = allDayRange(start)
+                    setStartLocal(toLocalDatetimeValue(dayStart))
+                    setEndLocal(toLocalDatetimeValue(dayEnd))
+                  } else {
+                    const d = new Date(startLocal)
+                    d.setHours(9, 0, 0, 0)
+                    const e = new Date(d)
+                    e.setHours(10, 0, 0, 0)
+                    setStartLocal(toLocalDatetimeValue(d))
+                    setEndLocal(toLocalDatetimeValue(e))
+                  }
+                }}
+              />
+              <Label htmlFor="task-allday" className="cursor-pointer font-normal">
+                All day
+              </Label>
+            </div>
+            <Button
+              type="button"
+              variant="default"
+              className="shrink-0"
+              disabled={loading || deleting || moving}
+              onClick={() => void moveToNextDay()}
+            >
+              {moving ? '…' : 'Move to next day'}
+            </Button>
           </div>
 
           {allDay ? (
@@ -267,7 +297,7 @@ export function TaskDetailDialog({
               type="button"
               variant="default"
               className="min-w-[88px] text-[#f28b82] hover:text-[#f28b82]"
-              disabled={loading || deleting}
+              disabled={loading || deleting || moving}
               onClick={() => void remove()}
             >
               {deleting ? '…' : 'Delete'}
@@ -277,12 +307,12 @@ export function TaskDetailDialog({
                 type="button"
                 variant="default"
                 className="min-w-[88px]"
-                disabled={loading || deleting}
+                disabled={loading || deleting || moving}
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" className="min-w-[112px]" disabled={loading || deleting}>
+              <Button type="submit" variant="primary" className="min-w-[112px]" disabled={loading || deleting || moving}>
                 {loading ? '…' : 'Save'}
               </Button>
             </div>
