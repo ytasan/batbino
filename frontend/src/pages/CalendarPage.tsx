@@ -305,6 +305,7 @@ export function CalendarPage() {
         onSignOut={() => logout()}
         onExportTasks={() => void onExportTasks()}
         onImportTasks={onImportTasks}
+        onCreateClick={() => setCreateOpen(true)}
       />
       {loadErr ? (
         <div className="border-b border-[#3c4043] bg-[#2d2e31] px-4 py-3 text-[14px] text-[#f28b82]">
@@ -324,7 +325,6 @@ export function CalendarPage() {
           calendars={calendars}
           visibleById={visibleById}
           onToggleCalendar={onToggleCalendar}
-          onCreateClick={() => setCreateOpen(true)}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
           searchResults={debouncedSearch ? events : []}

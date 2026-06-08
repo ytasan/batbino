@@ -1,5 +1,5 @@
 import { format, parseISO } from 'date-fns'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import type { CalendarListItem, EventApi } from '@/lib/api'
 import { MiniCalendar } from '@/components/MiniCalendar'
@@ -17,7 +17,6 @@ type SidebarProps = {
   calendars: CalendarListItem[]
   visibleById: Record<string, boolean>
   onToggleCalendar: (id: string, next: boolean) => void
-  onCreateClick: () => void
   searchQuery: string
   onSearchQueryChange: (query: string) => void
   searchResults: EventApi[]
@@ -33,7 +32,6 @@ export function Sidebar({
   calendars,
   visibleById,
   onToggleCalendar,
-  onCreateClick,
   searchQuery,
   onSearchQueryChange,
   searchResults,
@@ -48,39 +46,9 @@ export function Sidebar({
         collapsed ? 'w-14' : 'w-[272px]',
       )}
     >
-      <div
-        className={cn(
-          'border-b border-[#3c4043] pb-7 pt-[22px]',
-          collapsed ? 'flex justify-center px-2' : 'pl-9 pr-9',
-        )}
-      >
-        <button
-          type="button"
-          onClick={onCreateClick}
-          className={cn(
-            'flex items-center rounded-[24px] border border-transparent bg-transparent text-[#8ab4f8] transition-colors hover:bg-[#292a2d]',
-            collapsed
-              ? 'h-11 w-11 justify-center p-0'
-              : 'h-14 w-[124px] max-w-full justify-start gap-2 pl-7',
-          )}
-          aria-label="Create"
-        >
-          <span className="flex items-center rounded-full bg-gradient-to-br from-blue-400 via-orange-400 to-green-400 p-[2px]">
-            <span
-              className={cn(
-                'flex items-center justify-center rounded-full bg-[#131314]',
-                collapsed ? 'h-9 w-9' : 'h-11 w-11',
-              )}
-            >
-              <Plus className="h-6 w-6 text-[#8ab4f8]" strokeWidth={2} />
-            </span>
-          </span>
-          {!collapsed ? <span className="pb-0.5 text-[17px] font-medium">Create</span> : null}
-        </button>
-      </div>
-
       {!collapsed ? (
         <>
+          <div className="pt-[22px]">
           <MiniCalendar
             monthDate={monthDate}
             selectedDate={selectedDate}
@@ -88,6 +56,7 @@ export function Sidebar({
             onNavigateMonth={onNavigateSidebarMonth}
             onSelectDay={onSelectMiniDay}
           />
+          </div>
 
           <div className="px-4 pb-3">
             <Input

@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
+  Plus,
   Search,
   Settings,
 } from 'lucide-react'
@@ -25,6 +26,7 @@ type TopBarProps = {
   onSignOut: () => void
   onExportTasks: () => void
   onImportTasks: () => void
+  onCreateClick: () => void
 }
 
 export function TopBar({
@@ -36,6 +38,7 @@ export function TopBar({
   onSignOut,
   onExportTasks,
   onImportTasks,
+  onCreateClick,
 }: TopBarProps) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-[#3c4043] px-3 pl-4">
@@ -63,6 +66,19 @@ export function TopBar({
         <h1 className="truncate pl-2 text-[22px] font-normal capitalize text-[#e3e3e3]">
           {format(month, 'LLLL yyyy')}
         </h1>
+        <button
+          type="button"
+          onClick={onCreateClick}
+          className="ml-4 flex h-11 shrink-0 items-center gap-2 rounded-[24px] border border-transparent bg-transparent pl-1 pr-4 text-[#8ab4f8] transition-colors hover:bg-[#292a2d]"
+          aria-label="Create"
+        >
+          <span className="flex items-center rounded-full bg-gradient-to-br from-blue-400 via-orange-400 to-green-400 p-[2px]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#131314]">
+              <Plus className="h-5 w-5 text-[#8ab4f8]" strokeWidth={2} />
+            </span>
+          </span>
+          <span className="pb-0.5 text-[17px] font-medium">Create</span>
+        </button>
       </div>
       <div className="flex shrink-0 items-center gap-1 pr-2">
         <Button
