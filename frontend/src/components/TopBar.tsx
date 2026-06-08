@@ -5,7 +5,6 @@ import {
   ChevronRight,
   HelpCircle,
   Plus,
-  Search,
   Settings,
 } from 'lucide-react'
 
@@ -89,9 +88,6 @@ export function TopBar({
           onClick={onSignOut}
         >
           Sign out
-        </Button>
-        <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Search">
-          <Search className="h-5 w-5" />
         </Button>
         <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Help">
           <HelpCircle className="h-5 w-5" />
