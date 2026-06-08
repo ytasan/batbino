@@ -220,12 +220,11 @@ export function MonthGrid({
                             })
                           }}
                           className={cn(
-                            'cursor-pointer truncate rounded-sm px-1 py-0.5 text-left text-[12px] leading-tight text-[#e3e3e3] active:cursor-grabbing',
+                            'cursor-pointer truncate rounded-sm px-1 py-0.5 text-left text-[12px] leading-tight text-black active:cursor-grabbing',
                             ev.done && 'line-through opacity-60',
                           )}
                           style={{
-                            backgroundColor: `${ev.calendar.color}33`,
-                            borderLeft: `3px solid ${ev.calendar.color}`,
+                            backgroundColor: ev.calendar.color,
                           }}
                           title={ev.title}
                         >

@@ -72,12 +72,11 @@ export function DayTasksDialog({
                     })
                   }}
                   className={cn(
-                    'block w-full min-w-0 max-w-full cursor-pointer truncate rounded-sm px-2 py-1.5 text-left text-[13px] leading-tight text-[#e3e3e3] hover:brightness-110',
+                    'block w-full min-w-0 max-w-full cursor-pointer truncate rounded-sm px-2 py-1.5 text-left text-[13px] leading-tight text-black hover:brightness-110',
                     ev.done && 'line-through opacity-60',
                   )}
                   style={{
-                    backgroundColor: `${ev.calendar.color}33`,
-                    borderLeft: `3px solid ${ev.calendar.color}`,
+                    backgroundColor: ev.calendar.color,
                   }}
                   title={ev.title}
                 >
