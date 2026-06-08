@@ -10,7 +10,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 
 // yt note: DayTasksDialog = 1 gune sigmayan gorev listesinin yeni model win'de gosterimi 
 import { DayTasksDialog } from '@/components/DayTasksDialog'
@@ -19,6 +19,46 @@ import type { EventApi } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const TASK_DRAG_TYPE = 'application/x-batbino-task-id'
+const TASK_GAP_PX = 2 // gap-0.5
+const MIN_VISIBLE_TASKS = 1
+
+function useMaxVisibleTasksPerDay(gridRef: RefObject<HTMLDivElement | null>, weekCount: number) {
+  const taskMeasureRef = useRef<HTMLDivElement>(null)
+  const moreMeasureRef = useRef<HTMLDivElement>(null)
+  const [maxVisible, setMaxVisible] = useState(3)
+
+  useEffect(() => {
+    const grid = gridRef.current
+    if (!grid) return
+
+    const update = () => {
+      const dayCell = grid.querySelector('[data-day-cell]') as HTMLElement | null
+      const taskEl = taskMeasureRef.current
+      const moreEl = moreMeasureRef.current
+      if (!dayCell || !taskEl || !moreEl) return
+
+      const header = dayCell.querySelector('[data-day-header]') as HTMLElement | null
+      const taskH = taskEl.offsetHeight
+      const moreH = moreEl.offsetHeight
+      if (!taskH) return
+
+      const styles = getComputedStyle(dayCell)
+      const paddingY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom)
+      const headerH = header?.offsetHeight ?? 0
+      const available = dayCell.clientHeight - headerH - paddingY
+      const withMore = Math.floor((available - moreH) / (taskH + TASK_GAP_PX))
+
+      setMaxVisible(Math.max(MIN_VISIBLE_TASKS, withMore))
+    }
+
+    const ro = new ResizeObserver(update)
+    ro.observe(grid)
+    update()
+    return () => ro.disconnect()
+  }, [gridRef, weekCount])
+
+  return { maxVisible, taskMeasureRef, moreMeasureRef }
+}
 
 function chunkDays<T>(days: T[], size: number): T[][] {
   const out: T[][] = []
@@ -94,6 +134,11 @@ export function MonthGrid({
     return map
   }, [events, visibleCalendarIds])
 
+  const { maxVisible, taskMeasureRef, moreMeasureRef } = useMaxVisibleTasksPerDay(
+    gridRef,
+    weeks.length,
+  )
+
   function endDrag() {
     window.setTimeout(() => {
       dragActiveRef.current = false
@@ -105,6 +150,17 @@ export function MonthGrid({
       ref={gridRef}
       className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[#131314]"
     >
+      <div className="pointer-events-none absolute opacity-0" aria-hidden>
+        <div
+          ref={taskMeasureRef}
+          className="truncate rounded-sm px-1 py-0.5 text-[12px] leading-tight"
+        >
+          Measure
+        </div>
+        <div ref={moreMeasureRef} className="px-1 text-[11px]">
+          +0 more
+        </div>
+      </div>
       <div className="grid shrink-0 grid-cols-[40px_repeat(7,minmax(0,1fr))] border-b border-[#3c4043] text-center text-[11px] font-medium text-[#bdc1c6]">
         <div />
         {weekdays.map((d) => (
@@ -119,6 +175,7 @@ export function MonthGrid({
           return (
             <div
               key={weekDays[0].toISOString()}
+              data-week-row
               className="grid min-h-0 flex-1 grid-cols-[40px_repeat(7,minmax(0,1fr))]"
             >
               <div className="flex h-full items-start justify-center border-b border-[#3c4043] pt-4 text-[11px] text-[#80868b]">
@@ -131,10 +188,12 @@ export function MonthGrid({
                 const sel = isSameDay(d, selectedDate)
                 const isTodayCell = isSameDay(d, today)
                 const isDropTarget = dropTargetKey === dayKey
-                const topShow = dayEvts.slice(0, 3)
+                const topShow = dayEvts.slice(0, maxVisible)
+                const hiddenCount = dayEvts.length - maxVisible
                 return (
                   <div
                     key={d.toISOString()}
+                    data-day-cell
                     role="button"
                     tabIndex={0}
                     onClick={() => {
@@ -171,7 +230,7 @@ export function MonthGrid({
                       isDropTarget && 'bg-[#292a2d] ring-2 ring-[#8ab4f8] ring-offset-[-2px]',
                     )}
                   >
-                    <div className="mb-2 flex justify-end px-1">
+                    <div data-day-header className="mb-2 flex justify-end px-1">
                       <span
                         className={cn(
                           'flex h-7 min-w-[28px] items-center justify-center rounded-full px-2 text-[13px] leading-none tabular-nums',
@@ -231,7 +290,7 @@ export function MonthGrid({
                           {ev.title}
                         </div>
                       ))}
-                      {dayEvts.length > 3 ? (
+                      {hiddenCount > 0 ? (
                         <button
                           type="button"
                           onClick={(e) => {
@@ -240,7 +299,7 @@ export function MonthGrid({
                           }}
                           className="cursor-pointer px-1 text-left text-[11px] text-[#8ab4f8] hover:underline"
                         >
-                          +{dayEvts.length - 3} more
+                          +{hiddenCount} more
                         </button>
                       ) : null}
                     </div>
