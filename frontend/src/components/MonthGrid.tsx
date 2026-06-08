@@ -14,6 +14,7 @@ import { useMemo, useRef, useState } from 'react'
 
 // yt note: DayTasksDialog = 1 gune sigmayan gorev listesinin yeni model win'de gosterimi 
 import { DayTasksDialog } from '@/components/DayTasksDialog'
+import { TaskContextMenu } from '@/components/TaskContextMenu'
 import type { EventApi } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -34,6 +35,7 @@ type MonthGridProps = {
   onSelectDay: (d: Date) => void
   onSelectTask: (task: EventApi) => void
   onMoveTask: (taskId: string, targetDay: Date) => void
+  onDeleteTask: (task: EventApi) => void
   /** Tasks to render in day cells (prop name matches API: events). */
   events: EventApi[]
   visibleCalendarIds: Set<string>
@@ -46,12 +48,20 @@ export function MonthGrid({
   onSelectDay,
   onSelectTask,
   onMoveTask,
+  onDeleteTask,
   events,
   visibleCalendarIds,
 }: MonthGridProps) {
+  const gridRef = useRef<HTMLDivElement>(null)
   const [dropTargetKey, setDropTargetKey] = useState<string | null>(null)
   const [moreTasksDay, setMoreTasksDay] = useState<Date | null>(null)
+  const [contextMenu, setContextMenu] = useState<{
+    x: number
+    y: number
+    task: EventApi
+  } | null>(null)
   const dragActiveRef = useRef(false)
+  const suppressTaskClickRef = useRef(false)
 
   const { weeks, weekdays } = useMemo(() => {
     const moStart = startOfMonth(month)
@@ -89,7 +99,10 @@ export function MonthGrid({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[#131314]">
+    <div
+      ref={gridRef}
+      className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[#131314]"
+    >
       <div className="grid shrink-0 grid-cols-[40px_repeat(7,minmax(0,1fr))] border-b border-[#3c4043] text-center text-[11px] font-medium text-[#bdc1c6]">
         <div />
         {weekdays.map((d) => (
@@ -186,7 +199,23 @@ export function MonthGrid({
                           onClick={(e) => {
                             e.stopPropagation()
                             if (dragActiveRef.current) return
+                            if (suppressTaskClickRef.current) {
+                              suppressTaskClickRef.current = false
+                              return
+                            }
                             onSelectTask(ev)
+                          }}
+                          onContextMenu={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            suppressTaskClickRef.current = true
+                            const rect = gridRef.current?.getBoundingClientRect()
+                            if (!rect) return
+                            setContextMenu({
+                              x: e.clientX - rect.left,
+                              y: e.clientY - rect.top,
+                              task: ev,
+                            })
                           }}
                           className="cursor-pointer truncate rounded-sm px-1 py-0.5 text-left text-[12px] leading-tight text-[#e3e3e3] active:cursor-grabbing"
                           style={{
@@ -232,7 +261,20 @@ export function MonthGrid({
         }
         onSelectTask={onSelectTask}
         onMoveTask={onMoveTask}
+        onDeleteTask={onDeleteTask}
       />
+
+      {contextMenu ? (
+        <TaskContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          task={contextMenu.task}
+          onMoveTask={onMoveTask}
+          onEdit={onSelectTask}
+          onDelete={onDeleteTask}
+          onClose={() => setContextMenu(null)}
+        />
+      ) : null}
     </div>
   )
 }

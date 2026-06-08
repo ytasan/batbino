@@ -22,6 +22,7 @@ import {
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import {
+  deleteEventApi,
   fetchCalendars,
   fetchEvents,
   updateEventApi,
@@ -185,6 +186,16 @@ export function CalendarPage() {
     setCreateOpen(true)
   }
 
+  async function onDeleteTask(task: EventApi) {
+    setLoadErr(null)
+    try {
+      await deleteEventApi(task.id)
+      void reloadEvents()
+    } catch (e) {
+      setLoadErr(e instanceof Error ? e.message : 'Failed to delete task')
+    }
+  }
+
   async function onMoveTask(taskId: string, targetDay: Date) {
     const task = events.find((e) => e.id === taskId)
     if (!task) return
@@ -317,6 +328,7 @@ export function CalendarPage() {
                     setTaskDetailOpen(true)
                   }}
                   onMoveTask={(taskId, targetDay) => void onMoveTask(taskId, targetDay)}
+                  onDeleteTask={(task) => void onDeleteTask(task)}
                   events={events}
                   visibleCalendarIds={visibleCalendarIds}
                 />

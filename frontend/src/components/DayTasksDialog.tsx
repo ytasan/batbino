@@ -12,6 +12,7 @@ type DayTasksDialogProps = {
   tasks: EventApi[]
   onSelectTask: (task: EventApi) => void
   onMoveTask: (taskId: string, targetDay: Date) => void
+  onDeleteTask: (task: EventApi) => void
 }
 
 export function DayTasksDialog({
@@ -21,6 +22,7 @@ export function DayTasksDialog({
   tasks,
   onSelectTask,
   onMoveTask,
+  onDeleteTask,
 }: DayTasksDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [contextMenu, setContextMenu] = useState<{
@@ -84,6 +86,11 @@ export function DayTasksDialog({
               y={contextMenu.y}
               task={contextMenu.task}
               onMoveTask={onMoveTask}
+              onEdit={(task) => {
+                onSelectTask(task)
+                onOpenChange(false)
+              }}
+              onDelete={onDeleteTask}
               onClose={() => setContextMenu(null)}
             />
           ) : null}

@@ -8,6 +8,8 @@ type TaskContextMenuProps = {
   y: number
   task: EventApi
   onMoveTask: (taskId: string, targetDay: Date) => void
+  onEdit: (task: EventApi) => void
+  onDelete: (task: EventApi) => void
   onClose: () => void
 }
 
@@ -16,6 +18,8 @@ export function TaskContextMenu({
   y,
   task,
   onMoveTask,
+  onEdit,
+  onDelete,
   onClose,
 }: TaskContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null)
@@ -42,6 +46,20 @@ export function TaskContextMenu({
     onClose()
   }
 
+  function handleEdit() {
+    onEdit(task)
+    onClose()
+  }
+
+  function handleDelete() {
+    if (!window.confirm('Delete this task?')) return
+    onDelete(task)
+    onClose()
+  }
+
+  const itemClass =
+    'w-full px-3 py-2 text-left text-[13px] text-[#e3e3e3] hover:bg-[#3c4043]'
+
   return (
     <div
       ref={menuRef}
@@ -54,7 +72,7 @@ export function TaskContextMenu({
       <button
         type="button"
         role="menuitem"
-        className="w-full px-3 py-2 text-left text-[13px] text-[#e3e3e3] hover:bg-[#3c4043]"
+        className={itemClass}
         onMouseDown={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -62,6 +80,30 @@ export function TaskContextMenu({
         }}
       >
         Move to next day
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        className={itemClass}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          handleEdit()
+        }}
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        className={`${itemClass} text-[#f28b82]`}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          handleDelete()
+        }}
+      >
+        Delete
       </button>
     </div>
   )
