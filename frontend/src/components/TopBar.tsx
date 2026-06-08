@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import { useState } from 'react'
 import {
   ChevronDown,
   ChevronLeft,
@@ -8,6 +9,7 @@ import {
   Settings,
 } from 'lucide-react'
 
+import { HelpDialog } from '@/components/HelpDialog'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -39,7 +41,10 @@ export function TopBar({
   onImportTasks,
   onCreateClick,
 }: TopBarProps) {
+  const [helpOpen, setHelpOpen] = useState(false)
+
   return (
+    <>
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-[#3c4043] px-3 pl-4">
       <div className="flex min-w-0 items-center gap-1">
         <div className="mr-4 flex items-center gap-2 text-[22px] font-normal tracking-tight text-[#e3e3e3]">
@@ -89,7 +94,13 @@ export function TopBar({
         >
           Sign out
         </Button>
-        <Button variant="ghost" size="icon" className="text-[#bdc1c6]" aria-label="Help">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-[#bdc1c6]"
+          aria-label="Help"
+          onClick={() => setHelpOpen(true)}
+        >
           <HelpCircle className="h-5 w-5" />
         </Button>
         <DropdownMenu>
@@ -114,5 +125,7 @@ export function TopBar({
         </Button>
       </div>
     </header>
+    <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+    </>
   )
 }
