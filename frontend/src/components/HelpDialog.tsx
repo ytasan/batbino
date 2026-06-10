@@ -27,6 +27,10 @@ const FEATURES: FeatureRow[] = [
     description: 'Use Create in the header or click a day in the month grid.',
   },
   {
+    title: 'Calendar slash command',
+    description: 'In the title field, type / to pick a calendar with autocomplete (e.g. /work Buy milk).',
+  },
+  {
     title: 'Today',
     description: 'Jump back to the current date and month.',
   },

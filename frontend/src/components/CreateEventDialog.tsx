@@ -1,8 +1,10 @@
 // Dialog to create a task. Component and API names still use "event" internally.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import { SlashCalendarTitleInput } from '@/components/SlashCalendarTitleInput'
 import type { CalendarListItem } from '@/lib/api'
 import { createEventApi } from '@/lib/api'
+import { extractCalendarFromTitle } from '@/lib/slashCalendar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -44,6 +46,7 @@ export function CreateEventDialog({
   const [allDay, setAllDay] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     if (!open || calendars.length === 0) return
@@ -56,14 +59,31 @@ export function CreateEventDialog({
     setError(null)
   }, [open, defaultDay, calendars])
 
+  useEffect(() => {
+    if (!open) return
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (loading) return
+      if (e.key !== 'Enter' || (!e.ctrlKey && !e.metaKey)) return
+      e.preventDefault()
+      formRef.current?.requestSubmit()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, loading])
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    const cal = calendars.find((c) => c.id === calendarId)
+    const parsed = extractCalendarFromTitle(title, calendars)
+    const resolvedTitle = parsed.title
+    const resolvedCalendarId = parsed.calendar?.id ?? calendarId
+    const cal = calendars.find((c) => c.id === resolvedCalendarId)
     if (!cal) {
       setError('Select a calendar')
       return
     }
-    if (!title.trim()) {
+    if (!resolvedTitle) {
       setError('Title is required')
       return
     }
@@ -82,7 +102,7 @@ export function CreateEventDialog({
     try {
       await createEventApi({
         calendarId: cal.id,
-        title: title.trim(),
+        title: resolvedTitle,
         startAt: start.toISOString(),
         endAt: end.toISOString(),
         allDay,
@@ -100,14 +120,16 @@ export function CreateEventDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogTitle>New event</DialogTitle>
-        <form onSubmit={submit} className="grid gap-4">
+        <form ref={formRef} onSubmit={submit} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="evt-title">Title</Label>
-            <Input
+            <SlashCalendarTitleInput
               id="evt-title"
               value={title}
-              onChange={(x) => setTitle(x.target.value)}
-              placeholder="Event title"
+              onChange={setTitle}
+              calendarId={calendarId}
+              onCalendarIdChange={setCalendarId}
+              calendars={calendars}
               autoFocus
             />
           </div>
