@@ -51,7 +51,7 @@ export function TopBar({
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full text-2xl">
             <span className="text-[#8ab4f8]">■</span>
           </span>
-          <span>Batbino</span>
+          <span>batbino</span>
         </div>
         <Button variant="default" size="sm" className="font-medium" onClick={onToday}>
           Today

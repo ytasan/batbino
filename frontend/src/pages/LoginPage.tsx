@@ -37,7 +37,7 @@ export function LoginPage() {
   return (
     <div className="flex min-h-full items-center justify-center bg-[#131314] p-8">
       <div className="w-full max-w-md rounded-xl border border-[#3c4043] bg-[#1e1f20] p-8 shadow-2xl">
-        <h1 className="mb-2 text-2xl font-normal text-[#e3e3e3]">Batbino</h1>
+        <h1 className="mb-2 text-2xl font-normal text-[#e3e3e3]">batbino</h1>
         <p className="mb-8 text-[14px] text-[#80868b]">Create an account or sign in.</p>
         <div className="mb-6 flex gap-2 rounded-lg bg-[#131314] p-1">
           <button
