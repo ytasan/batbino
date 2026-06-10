@@ -1,5 +1,5 @@
 import { addDays, isSameDay, parseISO, startOfDay } from 'date-fns'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import type { CalendarListItem, EventApi } from '@/lib/api'
 import { deleteEventApi, updateEventApi } from '@/lib/api'
@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils'
+import { cn, isTypingTarget } from '@/lib/utils'
 
 function toLocalDatetimeValue(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -140,7 +140,7 @@ export function TaskDetailDialog({
     }
   }
 
-  async function remove() {
+  const remove = useCallback(async () => {
     if (!task) return
     if (!window.confirm('Delete this task?')) return
 
@@ -155,7 +155,25 @@ export function TaskDetailDialog({
     } finally {
       setDeleting(false)
     }
-  }
+  }, [task, onUpdated, onOpenChange])
+
+  useEffect(() => {
+    if (!open || !task) return
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (loading || deleting || moving) return
+      if (isTypingTarget(e.target)) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+
+      if (e.key === 'Delete' || e.key === 'd') {
+        e.preventDefault()
+        void remove()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, task, loading, deleting, moving, remove])
 
   if (!task) return null
 
@@ -163,7 +181,15 @@ export function TaskDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="max-w-lg"
+        onEscapeKeyDown={(e) => {
+          if (isTypingTarget(document.activeElement)) {
+            e.preventDefault()
+            ;(document.activeElement as HTMLElement).blur()
+          }
+        }}
+      >
         <div className="flex items-center gap-3 pr-8">
           <span
             className="h-4 w-4 shrink-0 rounded-full"

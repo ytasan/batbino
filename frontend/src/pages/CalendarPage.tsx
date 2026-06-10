@@ -21,7 +21,7 @@ import { RightSidebar } from '@/components/RightSidebar'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import { usePersistedBoolean } from '@/lib/usePersistedBoolean'
-import { cn } from '@/lib/utils'
+import { cn, isTypingTarget } from '@/lib/utils'
 import {
   deleteEventApi,
   fetchCalendars,
@@ -36,12 +36,6 @@ import {
 } from '@/lib/calendarVisibility'
 import { useAuth } from '@/context/AuthContext'
 import { exportTasksToJson, importTasksFromJsonFile } from '@/lib/taskExportImport'
-
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false
-  const tag = target.tagName
-  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
-}
 
 export function CalendarPage() {
   const { token, logout, user } = useAuth()
